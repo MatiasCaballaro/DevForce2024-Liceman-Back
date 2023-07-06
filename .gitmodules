@@ -1,0 +1,6 @@
+[submodule "application"]
+	path = application
+	url = file:///C:/repositorios/DEVFORCE/liceman/application
+[submodule "mock"]
+	path = mock
+	url = file:///C:/repositorios/DEVFORCE/liceman/mock
