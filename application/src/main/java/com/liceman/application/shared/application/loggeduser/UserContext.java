@@ -1,6 +1,6 @@
 package com.liceman.application.shared.application.loggeduser;
 
-import com.liceman.application.usuario.domain.User;
+import com.liceman.application.user.domain.User;
 
 public class UserContext {
     private static final ThreadLocal<User> USER_CONTEXT = new ThreadLocal<>();

@@ -1,12 +1,12 @@
 package com.liceman.application.security.application;
 
 import com.liceman.application.security.domain.token.Token;
-import com.liceman.application.security.domain.token.TokenJPARepository;
+import com.liceman.application.security.domain.token.TokenRepository;
 import com.liceman.application.security.domain.token.TokenType;
 import com.liceman.application.security.infrastructure.dto.AuthenticationRequest;
 import com.liceman.application.security.infrastructure.dto.AuthenticationResponse;
-import com.liceman.application.usuario.domain.User;
-import com.liceman.application.usuario.domain.repository.UserRepository;
+import com.liceman.application.user.domain.User;
+import com.liceman.application.user.domain.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,11 +22,9 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class AuthenticationService {
     private final UserRepository userRepository;
-    private final TokenJPARepository tokenJPARepository;
+    private final TokenRepository tokenRepository;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-
-
 
     public AuthenticationResponse authenticate (AuthenticationRequest request) {
         authenticationManager.authenticate(
@@ -55,20 +53,18 @@ public class AuthenticationService {
                 .expired(false)
                 .revoked(false)
                 .build();
-        tokenJPARepository.save(token);
+        tokenRepository.save(token);
     }
 
-
-
     private void revokeAllUserTokens (User user) {
-        var validUserTokens = tokenJPARepository.findAllValidTokenByUser(user.getId());
+        var validUserTokens = tokenRepository.findAllValidTokenByUser(user.getId());
         if (validUserTokens.isEmpty())
             return;
         validUserTokens.forEach(token -> {
             token.setExpired(true);
             token.setRevoked(true);
         });
-        tokenJPARepository.saveAll(validUserTokens);
+        tokenRepository.saveAll(validUserTokens);
     }
 
     public void refreshToken (

@@ -1,7 +1,7 @@
 package com.liceman.application.shared.application.loggeduser;
 
-import com.liceman.application.usuario.domain.User;
-import com.liceman.application.usuario.domain.repository.UserRepository;
+import com.liceman.application.user.domain.User;
+import com.liceman.application.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;

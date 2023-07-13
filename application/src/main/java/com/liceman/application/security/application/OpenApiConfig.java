@@ -18,7 +18,7 @@ import io.swagger.v3.oas.annotations.servers.Server;
                         url = "https://github.com/MatiasCaballaro/devForce2024"
                 ),
                 description = "Documentation for Liceman project @devForce - 2024 practices.<br><br>"
-                + "Solicitudes can have these status = ",
+                + "Trainings can have these status = ",
 
                 title = "Liceman Documentation",
                 version = "1.0",

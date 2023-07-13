@@ -1,10 +1,10 @@
 package com.liceman.application.shared.application.mappers;
 
-import com.liceman.application.solicitud.domain.Solicitud;
-import com.liceman.application.solicitud.infrastructure.dto.SolicitudDTO;
-import com.liceman.application.usuario.domain.User;
-import com.liceman.application.usuario.infrastructure.dto.UserResponseDTO;
-import com.liceman.application.usuario.infrastructure.dto.UserResponseWithoutSolicitudDTO;
+import com.liceman.application.training.domain.Training;
+import com.liceman.application.training.infrastructure.dto.TrainingDTO;
+import com.liceman.application.user.domain.User;
+import com.liceman.application.user.infrastructure.dto.UserResponseDTO;
+import com.liceman.application.user.infrastructure.dto.UserResponseWithoutTrainingDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.stream.Collectors;
@@ -19,45 +19,47 @@ public class MapperUtilsImpl implements MapperUtils{
         userResponseDTO.setFirstname(user.getFirstname());
         userResponseDTO.setLastname(user.getLastname());
         userResponseDTO.setEmail(user.getEmail());
+        userResponseDTO.setRole(user.getRole().toString());
         userResponseDTO.setPhone(user.getPhone());
         userResponseDTO.setArea(user.getArea());
         userResponseDTO.setHasTeams(user.getHasTeams());
-        userResponseDTO.setSolicitudes(user.getSolicitudes().stream().map(this::mapperToSolicitudUserResponseDTO).collect(Collectors.toList()));
+        userResponseDTO.setTrainings(user.getTrainings().stream().map(this::mapperToTrainingUserResponseDTO).collect(Collectors.toList()));
         return userResponseDTO;
     }
 
     @Override
-    public UserResponseWithoutSolicitudDTO MapperToUserWithoutSolicitudDTO (User user) {
-        UserResponseWithoutSolicitudDTO userDTO = new UserResponseWithoutSolicitudDTO();
+    public UserResponseWithoutTrainingDTO MapperToUserWithoutTrainingDTO (User user) {
+        UserResponseWithoutTrainingDTO userDTO = new UserResponseWithoutTrainingDTO();
         userDTO.setId(user.getId());
         userDTO.setFirstname(user.getFirstname());
         userDTO.setLastname(user.getLastname());
         userDTO.setEmail(user.getEmail());
+        userDTO.setRole(user.getRole().toString());
         userDTO.setPhone(user.getPhone());
         userDTO.setHasTeams(user.getHasTeams());
         return userDTO;
     }
     @Override
-    public SolicitudDTO mapperToSolicitudUserResponseDTO (Solicitud solicitud) {
-        SolicitudDTO solicitudDTO = SolicitudDTO.builder()
-                .id(solicitud.getId())
-                .area(solicitud.getArea())
-                .creationDate(solicitud.getCreationDate())
-                .status(solicitud.getStatus())
-                .userComment(solicitud.getUserComment())
-                .mentorComment(solicitud.getMentorComment())
-                .days(solicitud.getDays())
-                .link(solicitud.getLink())
-                .approvedDate(solicitud.getApprovedDate())
-                .endDate(solicitud.getEndDate())
-                .userId(this.MapperToUserWithoutSolicitudDTO(solicitud.getUserId()))
+    public TrainingDTO mapperToTrainingUserResponseDTO (Training training) {
+        TrainingDTO trainingDTO = TrainingDTO.builder()
+                .id(training.getId())
+                .area(training.getArea())
+                .creationDate(training.getCreationDate())
+                .status(training.getStatus())
+                .userComment(training.getUserComment())
+                .mentorComment(training.getMentorComment())
+                .days(training.getDays())
+                .link(training.getLink())
+                .approvedDate(training.getApprovedDate())
+                .endDate(training.getEndDate())
+                .userId(this.MapperToUserWithoutTrainingDTO(training.getUserId()))
                 .build();
-        if(solicitud.getMentorId()!=null){
-            solicitudDTO.setMentorId(this.MapperToUserWithoutSolicitudDTO(solicitud.getMentorId()));
+        if(training.getMentorId()!=null){
+            trainingDTO.setMentorId(this.MapperToUserWithoutTrainingDTO(training.getMentorId()));
         }
-        if(solicitud.getAdminId()!=null){
-            solicitudDTO.setAdminId(this.MapperToUserWithoutSolicitudDTO(solicitud.getAdminId()));
+        if(training.getAdminId()!=null){
+            trainingDTO.setAdminId(this.MapperToUserWithoutTrainingDTO(training.getAdminId()));
         }
-        return solicitudDTO;
+        return trainingDTO;
     }
 }
