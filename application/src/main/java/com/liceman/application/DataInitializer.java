@@ -1,8 +1,10 @@
 package com.liceman.application;
 
 import com.liceman.application.shared.exceptions.TrainingNotExistsException;
+import com.liceman.application.training.domain.Comment;
 import com.liceman.application.training.domain.Training;
 import com.liceman.application.training.domain.enums.Status;
+import com.liceman.application.training.domain.repository.CommentRepository;
 import com.liceman.application.training.domain.repository.TrainingRepository;
 import com.liceman.application.training.infrastructure.dto.TrainingCreationRequestDTO;
 import com.liceman.application.training.infrastructure.dto.UpdateTrainingByMentorDTO;
@@ -18,6 +20,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.NoSuchElementException;
 
 import static com.liceman.application.training.domain.enums.Status.PENDIENTE_USER;
@@ -37,6 +40,8 @@ public class DataInitializer implements CommandLineRunner {
     private final TrainingRepository trainingRepository;
 
     private final UserRepository userRepository;
+
+    private final CommentRepository commentRepository;
 
     @Override
     public void run(String... args) {
@@ -69,7 +74,6 @@ public class DataInitializer implements CommandLineRunner {
                     .hasTeams(true)
                     .build();
             System.out.println("User2 token: " + userService.createUser(user2).getAccessToken());
-
 
             UserRequestDTO mentor1 = UserRequestDTO.builder()
                     .firstname("Mentor")
@@ -120,26 +124,27 @@ public class DataInitializer implements CommandLineRunner {
             System.out.println("TRAINING CREATION");
             System.out.println("================================================================================");
 
+
             TrainingCreationRequestDTO training1 = TrainingCreationRequestDTO.builder()
-                    .userComment("Necesito estudiar JAVA")
+                    .comment("Necesito estudiar JAVA")
                     .area(Area.BACKEND)
                     .build();
             System.out.println("Training1 (BACKEND)" + createTraining(training1,user1));
 
             TrainingCreationRequestDTO training2 = TrainingCreationRequestDTO.builder()
-                    .userComment("Necesito estudiar SPRING BOOT")
+                    .comment("Necesito estudiar SPRING BOOT")
                     .area(Area.BACKEND)
                     .build();
             System.out.println("Training1 (BACKEND)" + createTraining(training2,user1));
 
             TrainingCreationRequestDTO training3 = TrainingCreationRequestDTO.builder()
-                    .userComment("Necesito estudiar REACT")
+                    .comment("Necesito estudiar REACT")
                     .area(Area.FRONTEND)
                     .build();
             System.out.println("Training1 (FRONTEND)" + createTraining(training3,user1));
 
             TrainingCreationRequestDTO training4 = TrainingCreationRequestDTO.builder()
-                    .userComment("Necesito estudiar SQL")
+                    .comment("Necesito estudiar SQL")
                     .area(Area.DATA)
                     .build();
             System.out.println("Training1 (BACKEND)" + createTraining(training4,user2));
@@ -150,23 +155,23 @@ public class DataInitializer implements CommandLineRunner {
             System.out.println("================================================================================");
 
             UpdateTrainingByMentorDTO trainingMentor1= UpdateTrainingByMentorDTO.builder()
-                    .mentorComment("Te sugiero que veas el curso de udemy que adjunto en el link. Si estás de acuerdo, " +
+                    .comment("Te sugiero que veas el curso de udemy que adjunto en el link. Si estás de acuerdo, " +
                             "acepta la training, o puedes contactarme por Teams. Éxitos!")
                     .link("#")
                     .days(30)
                     .status(Status.PENDIENTE_USER)
                     .build();
-            System.out.println("Training1 Actualizada por Mentor1" + updateTrainingMentor(1L,trainingMentor1,mentor1));
+            System.out.println("Training1 Actualizado por Mentor1" + updateTrainingMentor(1L,trainingMentor1,mentor1));
 
 
             UpdateTrainingByMentorDTO trainingMentor2= UpdateTrainingByMentorDTO.builder()
-                    .mentorComment("Te sugiero que veas el curso de udemy que adjunto en el link. Si estás de acuerdo" +
-                            "acepta la training, o puedes contactarme por Teams. Éxitos!")
+                    .comment("Te sugiero que veas el curso de udemy que adjunto en el link. Si estás de acuerdo " +
+                            "acepta el training, o puedes contactarme por Teams. Éxitos!")
                     .link("#")
                     .days(45)
                     .status(Status.PENDIENTE_USER)
                     .build();
-            System.out.println("Training1 Actualizada por Mentor1" + updateTrainingMentor(2L,trainingMentor2,mentor1));
+            System.out.println("Training1 Actualizado por Mentor1" + updateTrainingMentor(2L,trainingMentor2,mentor1));
 
 
             System.out.println("================================================================================");
@@ -177,7 +182,7 @@ public class DataInitializer implements CommandLineRunner {
             UpdateTrainingByUserDTO trainingUser1= UpdateTrainingByUserDTO.builder()
                     .status(Status.PENDIENTE_ADMIN)
                     .build();
-            System.out.println("Training1 Actualizada por User1" + UpdateUserTrainingDTO(1L,trainingUser1));
+            System.out.println("Training1 Actualizado por User1" + UpdateUserTrainingDTO(1L,trainingUser1));
 
 
             System.out.println("================================================================================");
@@ -191,13 +196,24 @@ public class DataInitializer implements CommandLineRunner {
         }
     }
 
-    private Training createTraining (TrainingCreationRequestDTO trainingCreationRequestDTO, UserRequestDTO userDTO) {
+    private Training createTraining(TrainingCreationRequestDTO trainingCreationRequestDTO, UserRequestDTO userDTO) {
         Training newTraining = new Training();
         newTraining.setArea(trainingCreationRequestDTO.getArea());
-        newTraining.setUserComment(trainingCreationRequestDTO.getUserComment());
+
+        // Crear el comentario
+        Comment comment = Comment.builder()
+                .training_id(newTraining)
+                .user_id(userRepository.findByEmail(userDTO.getEmail()).orElseThrow(NoSuchElementException::new))
+                .message(trainingCreationRequestDTO.getComment())
+                .build();
+
+        // Asignar el comentario al training
+        newTraining.setComments(Collections.singletonList(comment));
+
         newTraining.setCreationDate(LocalDateTime.now());
         newTraining.setStatus(Status.PENDIENTE_MENTOR);
         newTraining.setUserId(userRepository.findByEmail(userDTO.getEmail()).orElseThrow(NoSuchElementException::new));
+
         return trainingRepository.save(newTraining);
     }
 
@@ -205,7 +221,15 @@ public class DataInitializer implements CommandLineRunner {
         try {
             Training training = trainingRepository.findById(id).orElseThrow(TrainingNotExistsException::new);
             training.setMentorId(userRepository.findByEmail(userDTO.getEmail()).orElseThrow(NoSuchElementException::new));
-            training.setMentorComment(request.getMentorComment());
+
+            Comment comment = Comment.builder()
+                    .training_id(training)
+                    .user_id(userRepository.findByEmail(userDTO.getEmail()).orElseThrow(NoSuchElementException::new))
+                    .message(request.getComment())
+                    .build();
+
+            training.getComments().add(comment);
+
             training.setDays(request.getDays());
             training.setLink(request.getLink());
             if(request.getStatus().equals(PENDIENTE_USER)){

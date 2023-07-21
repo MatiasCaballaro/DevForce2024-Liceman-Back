@@ -1,6 +1,8 @@
 package com.liceman.application.shared.application.mappers;
 
+import com.liceman.application.training.domain.Comment;
 import com.liceman.application.training.domain.Training;
+import com.liceman.application.training.infrastructure.dto.CommentDTO;
 import com.liceman.application.training.infrastructure.dto.TrainingDTO;
 import com.liceman.application.user.domain.User;
 import com.liceman.application.user.infrastructure.dto.UserResponseDTO;
@@ -10,10 +12,10 @@ import org.springframework.stereotype.Service;
 import java.util.stream.Collectors;
 
 @Service
-public class MapperUtilsImpl implements MapperUtils{
+public class MapperUtilsImpl implements MapperUtils {
 
     @Override
-    public UserResponseDTO MapperToUserDTO (User user) {
+    public UserResponseDTO mapperToUserDTO(User user) {
         UserResponseDTO userResponseDTO = new UserResponseDTO();
         userResponseDTO.setId(user.getId());
         userResponseDTO.setFirstname(user.getFirstname());
@@ -28,7 +30,7 @@ public class MapperUtilsImpl implements MapperUtils{
     }
 
     @Override
-    public UserResponseWithoutTrainingDTO MapperToUserWithoutTrainingDTO (User user) {
+    public UserResponseWithoutTrainingDTO mapperToUserWithoutTrainingDTO(User user) {
         UserResponseWithoutTrainingDTO userDTO = new UserResponseWithoutTrainingDTO();
         userDTO.setId(user.getId());
         userDTO.setFirstname(user.getFirstname());
@@ -39,27 +41,39 @@ public class MapperUtilsImpl implements MapperUtils{
         userDTO.setHasTeams(user.getHasTeams());
         return userDTO;
     }
+
     @Override
-    public TrainingDTO mapperToTrainingUserResponseDTO (Training training) {
+    public TrainingDTO mapperToTrainingUserResponseDTO(Training training) {
         TrainingDTO trainingDTO = TrainingDTO.builder()
                 .id(training.getId())
                 .area(training.getArea())
                 .creationDate(training.getCreationDate())
                 .status(training.getStatus())
-                .userComment(training.getUserComment())
-                .mentorComment(training.getMentorComment())
+                .comments(training.getComments().stream().map(this::mapperToCommentDTO).collect(Collectors.toList()))
                 .days(training.getDays())
                 .link(training.getLink())
                 .approvedDate(training.getApprovedDate())
                 .endDate(training.getEndDate())
-                .userId(this.MapperToUserWithoutTrainingDTO(training.getUserId()))
+                .userId(this.mapperToUserWithoutTrainingDTO(training.getUserId()))
                 .build();
-        if(training.getMentorId()!=null){
-            trainingDTO.setMentorId(this.MapperToUserWithoutTrainingDTO(training.getMentorId()));
+        if (training.getMentorId() != null) {
+            trainingDTO.setMentorId(this.mapperToUserWithoutTrainingDTO(training.getMentorId()));
         }
-        if(training.getAdminId()!=null){
-            trainingDTO.setAdminId(this.MapperToUserWithoutTrainingDTO(training.getAdminId()));
+        if (training.getAdminId() != null) {
+            trainingDTO.setAdminId(this.mapperToUserWithoutTrainingDTO(training.getAdminId()));
         }
         return trainingDTO;
+    }
+
+    @Override
+    public CommentDTO mapperToCommentDTO(Comment comment) {
+        CommentDTO commentDTO = CommentDTO.builder()
+                .id(comment.getId())
+                .userName(comment.getUser_id().getFirstname() + " " + comment.getUser_id().getLastname())
+                .user_id(comment.getUser_id().getId())
+                .message(comment.getMessage())
+                .created_at(comment.getCreated_at())
+                .build();
+        return commentDTO;
     }
 }

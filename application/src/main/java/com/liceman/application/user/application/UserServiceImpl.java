@@ -83,19 +83,19 @@ public class UserServiceImpl implements UserService {
     public List<UserResponseDTO> findAllUsers () {
         return userRepository.findAll()
                 .stream()
-                .map(mapperUtils::MapperToUserDTO)
+                .map(mapperUtils::mapperToUserDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
     public Optional<UserResponseDTO> getUserById (Long id) {
         Optional<User> user = Optional.ofNullable(userRepository.findById(id).orElseThrow(RuntimeException::new));
-        return user.map(mapperUtils::MapperToUserDTO);
+        return user.map(mapperUtils::mapperToUserDTO);
     }
     @LoggedUser
     @Override
     public Optional<UserResponseWithoutTrainingDTO> getLoggedUser(){
-        return Optional.ofNullable(mapperUtils.MapperToUserWithoutTrainingDTO(UserContext.getUser()));
+        return Optional.ofNullable(mapperUtils.mapperToUserWithoutTrainingDTO(UserContext.getUser()));
     }
 
     //El método UpdateOwnUser no involucra el cambio de mail
@@ -104,7 +104,7 @@ public class UserServiceImpl implements UserService {
     public UserResponseDTO updateOwnUser (UserRequestDTO userRequestDTO) {
         User loggedUser = UserContext.getUser();
         UpdateUserData(userRequestDTO, loggedUser);
-        return mapperUtils.MapperToUserDTO(userRepository.save(loggedUser));
+        return mapperUtils.mapperToUserDTO(userRepository.save(loggedUser));
     }
 
     private void UpdateUserData (UserRequestDTO userRequestDTO, User user) {

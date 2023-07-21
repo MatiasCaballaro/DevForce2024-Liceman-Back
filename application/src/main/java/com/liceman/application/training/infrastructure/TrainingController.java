@@ -37,7 +37,7 @@ public class TrainingController {
     @GetMapping
     @PreAuthorize("hasAuthority('training:read')")
     public ResponseEntity<ResponseDTO> getTrainings () {
-        return ResponseEntity.ok().body(new ResponseDTO(true, "Trainings Obtenidas", trainingService.getTrainings()
+        return ResponseEntity.ok().body(new ResponseDTO(true, "Trainings Obtenidas", trainingService.getTrainingsAccordingToRole()
                 .stream()
                 .map(mapperUtils::mapperToTrainingUserResponseDTO)
                 .collect(Collectors.toList())));

@@ -50,7 +50,6 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Token> tokens;
 
-
     @OneToMany(mappedBy = "userId", fetch = FetchType.EAGER)
     private List<Training> trainings = new ArrayList<>();
 

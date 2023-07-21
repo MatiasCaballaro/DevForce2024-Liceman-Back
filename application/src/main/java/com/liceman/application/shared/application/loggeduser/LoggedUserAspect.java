@@ -24,7 +24,7 @@ public class LoggedUserAspect {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User loggedUser = UserContext.getUser();
 
-        if (loggedUser == null) {
+           if (loggedUser == null || !loggedUser.getEmail().equals(authentication.getName())) {
             loggedUser = userRepository.findByEmail(authentication.getName())
                     .orElseThrow(() -> new NoSuchElementException("Usuario no encontrado con el correo electrónico: " + authentication.getName()));
             UserContext.setUser(loggedUser);

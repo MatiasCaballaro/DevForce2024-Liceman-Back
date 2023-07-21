@@ -3,7 +3,6 @@ package com.liceman.application.training.infrastructure.dto;
 import com.liceman.application.training.domain.enums.Status;
 import com.liceman.application.user.domain.enums.Area;
 import com.liceman.application.user.infrastructure.dto.UserResponseWithoutTrainingDTO;
-import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
@@ -12,6 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -34,12 +34,7 @@ public class TrainingDTO {
 
     private Status status;
 
-
-    @Column(name = "user_comment")
-    private String userComment;
-
-    @Column(name = "mentor_comment")
-    private String mentorComment;
+    private List<CommentDTO> comments;
 
     private String link;
 

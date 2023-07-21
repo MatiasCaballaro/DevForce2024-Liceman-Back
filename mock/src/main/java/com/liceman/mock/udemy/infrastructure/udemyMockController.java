@@ -3,6 +3,7 @@ package com.liceman.mock.udemy.infrastructure;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.liceman.mock.shared.application.CreatorFromJsonService;
 import com.liceman.mock.udemy.domain.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,7 +23,7 @@ import java.util.Collections;
 @RequiredArgsConstructor
 public class udemyMockController {
 
-
+    private final CreatorFromJsonService creatorFromJsonService;
     @Operation(
             description = "test Mock Activity"
     )
@@ -720,15 +721,7 @@ public class udemyMockController {
                 "    ]\n" +
                 "}";
 
-        ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
-        LearningPathResult learningPathResult = null;
-        try {
-            learningPathResult = objectMapper.readValue(json, LearningPathResult.class);
-            System.out.println(learningPathResult);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        return ResponseEntity.ok().body(learningPathResult);
+        return creatorFromJsonService.createFromJson(json, LearningPathResult.class);
 
     }
 }

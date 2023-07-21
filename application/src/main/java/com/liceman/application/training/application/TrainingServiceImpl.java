@@ -3,12 +3,17 @@ package com.liceman.application.training.application;
 import com.liceman.application.shared.application.loggeduser.LoggedUser;
 import com.liceman.application.shared.application.loggeduser.UserContext;
 import com.liceman.application.shared.exceptions.TrainingNotExistsException;
+import com.liceman.application.training.domain.Comment;
 import com.liceman.application.training.domain.Training;
 import com.liceman.application.training.domain.enums.Status;
 import com.liceman.application.training.domain.repository.TrainingRepository;
-import com.liceman.application.training.infrastructure.dto.*;
+import com.liceman.application.training.infrastructure.dto.TrainingCreationRequestDTO;
+import com.liceman.application.training.infrastructure.dto.UpdateTrainingByAdminDTO;
+import com.liceman.application.training.infrastructure.dto.UpdateTrainingByMentorDTO;
+import com.liceman.application.training.infrastructure.dto.UpdateTrainingByUserDTO;
 import com.liceman.application.user.domain.User;
-import com.liceman.application.user.domain.enums.*;
+import com.liceman.application.user.domain.enums.Area;
+import com.liceman.application.user.domain.enums.Role;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,24 +33,29 @@ public class TrainingServiceImpl implements TrainingService {
 
     @LoggedUser
     @Override
-    public Training createTraining (TrainingCreationRequestDTO trainingCreationRequestDTO) {
+    public Training createTraining(TrainingCreationRequestDTO trainingCreationRequestDTO) {
         Training newTraining = new Training();
         newTraining.setArea(trainingCreationRequestDTO.getArea());
-        newTraining.setUserComment(trainingCreationRequestDTO.getUserComment());
         newTraining.setUserId(UserContext.getUser());
         newTraining.setCreationDate(LocalDateTime.now());
         newTraining.setStatus(Status.PENDIENTE_MENTOR);
+
+        Comment comment = Comment.builder()
+                .training_id(newTraining)
+                .user_id(UserContext.getUser())
+                .message(trainingCreationRequestDTO.getComment())
+                .build();
+
+        newTraining.getComments().add(comment);
+
         return trainingRepository.save(newTraining);
     }
 
+
     @LoggedUser
     @Override
-    public List<Training> getTrainings () {
-        return getTrainingsAccordingToRole(UserContext.getUser());
-    }
-
-    private List<Training> getTrainingsAccordingToRole (User user) {
-
+    public List<Training> getTrainingsAccordingToRole () {
+        User user = UserContext.getUser();
         if (user.getRole() == Role.USER) {
             return getAllTrainingsByUser(user); // Get all trainings created by the logged user
         } else if (user.getRole() == Role.MENTOR) {
@@ -56,15 +66,15 @@ public class TrainingServiceImpl implements TrainingService {
     }
 
     private List<Training> getAllTrainingsByUser (User user) {
-        return trainingRepository.findAllByUserIdIs(user);
+        return trainingRepository.findAllByUserIdOrderByIdDesc(user);
     }
 
     private List<Training> getAllTrainingsByArea (Area area) {
-        return trainingRepository.findAllByArea(area);
+        return trainingRepository.findAllByAreaOrderByIdDesc(area);
     }
 
     private List<Training> getAllTrainings () {
-        return trainingRepository.findAll();
+        return trainingRepository.findAllOrderByIdDesc();
     }
 
     @LoggedUser
@@ -138,7 +148,14 @@ public class TrainingServiceImpl implements TrainingService {
 
     private void UpdateTrainingFromMentorRequest (Training training, UpdateTrainingByMentorDTO request) {
         training.setMentorId(UserContext.getUser());
-        training.setMentorComment(request.getMentorComment());
+        Comment comment = Comment.builder()
+                .training_id(training)
+                .user_id(UserContext.getUser())
+                .message(request.getComment())
+                .build();
+
+        training.getComments().add(comment);
+
         training.setDays(request.getDays());
         training.setLink(request.getLink());
         handledTrainingStatusUpdate(training, request.getStatus(), PENDIENTE_USER);

@@ -14,6 +14,7 @@ public class UpdateTrainingByMentorDTO {
 
     private Integer days;
     private String link;
-    private String mentorComment;
+    private String comment;
     private Status status;
+
 }

@@ -10,6 +10,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Builder
@@ -40,13 +42,17 @@ public class Training {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    //TODO: Ver si hacemos List<String> del comentario, quiza hacer una clase Comentario
+    /*//TODO: Ver si hacemos List<String> del comentario, quiza hacer una clase Comentario
     @Column(name = "user_comment")
     private String userComment;
 
     //TODO: Ver si hacemos List<String> del comentario, quiza hacer una clase Comentario
     @Column(name = "mentor_comment")
-    private String mentorComment;
+    private String mentorComment;*/
+
+
+    @OneToMany(mappedBy = "training_id", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    List<Comment> comments = new ArrayList<>();
 
     private String link;
 
