@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -19,6 +20,30 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+
+
+    @Operation(
+            description = "Sube una foto del usuario en formato "
+            //summary = ""
+    )
+    @PostMapping("/Avatar")
+    @PreAuthorize("hasAuthority('user:read')")
+    public ResponseEntity<ResponseDTO> uploadAvatar(@RequestParam("image") MultipartFile file) {
+        return ResponseEntity.ok().body(userService.uploadAvatar(file));
+
+    }
+
+    @Operation(
+            description = "Devuelte el Avatar encodeado en base64 para el usuario logueado "
+    )
+    @GetMapping("/Avatar")
+    @PreAuthorize("hasAuthority('user:read')")
+    public  ResponseEntity<ResponseDTO> getAvatar() {
+        return ResponseEntity.ok().body(userService.getAvatar());
+
+    }
+
+
 
     @Operation(
             description = "Devuelve la lista total de usuarios como UserResponseDTO. " +
