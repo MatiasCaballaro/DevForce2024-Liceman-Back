@@ -17,6 +17,8 @@ import com.liceman.application.user.infrastructure.dto.UserRequestDTO;
 import com.liceman.application.user.infrastructure.dto.UserResponseDTO;
 import com.liceman.application.user.infrastructure.dto.UserResponseWithoutTrainingDTO;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,6 +36,8 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
+    @Value("${avatar.baseRoute}")
+    private String BaseRoute;
     private final TokenRepository tokenRepository;
 
     private final MapperUtils mapperUtils;
@@ -41,6 +45,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     private final JwtService jwtService;
+
 
 
 
@@ -53,7 +58,7 @@ public class UserServiceImpl implements UserService {
                 return new ResponseDTO(false,"Avatar not Uploaded","Formato de archivo incorrecto");
 
             }
-            File file1 = new File("C:/Avatares/"+UserContext.getUser().getId());
+            File file1 = new File(BaseRoute+UserContext.getUser().getId());
             outputStream = new BufferedOutputStream(new FileOutputStream(file1));
             outputStream.write(file.getBytes());
 
@@ -73,7 +78,7 @@ public class UserServiceImpl implements UserService {
     public ResponseDTO getAvatar()  {
         InputStream inputStream = null;
         try{
-            File file = new File("C:/Avatares/"+UserContext.getUser().getId());
+            File file = new File(BaseRoute+UserContext.getUser().getId());
             inputStream = new BufferedInputStream(new FileInputStream(file));
             byte[] dataByte = inputStream.readAllBytes();
             inputStream.close();
