@@ -2,7 +2,9 @@ package com.liceman.application.udemy.course.application;
 
 import com.liceman.application.udemy.course.domain.Course;
 import com.liceman.application.udemy.course.domain.Courses;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.binary.Base64;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -16,6 +18,7 @@ import java.io.IOException;
 import java.util.Objects;
 
 @Service
+@RequiredArgsConstructor
 public class CourseServiceImpl implements CourseService {
 
     @Value("${mock.udemy}")
@@ -36,6 +39,7 @@ public class CourseServiceImpl implements CourseService {
     @Value("${udemy.client.secret}")
     String secret;
 
+    private final RestTemplate restTemplate;
 
     @Override
     public Courses getCourses() throws IOException {
@@ -47,8 +51,12 @@ public class CourseServiceImpl implements CourseService {
 
     private Courses callMockCourses() {
         String mockedActivityCourseUrl = mockedEndpoint + "/udemy/courses";
-        ResponseEntity<Courses> response = new RestTemplate(new SimpleClientHttpRequestFactory())
-                .exchange(mockedActivityCourseUrl, HttpMethod.GET, null, Courses.class);
+        ResponseEntity<Courses> response = restTemplate.exchange(
+                mockedActivityCourseUrl,
+                HttpMethod.GET,
+                null,
+                Courses.class
+        );
         return Objects.requireNonNull(response.getBody());
     }
 
@@ -64,12 +72,12 @@ public class CourseServiceImpl implements CourseService {
 
     private Courses callUdemyCourses() throws IOException {
         try {
-            ResponseEntity<Courses> response = new RestTemplate(new SimpleClientHttpRequestFactory())
-                    .exchange(
-                            getCoursesURL(),
-                            HttpMethod.GET,
-                            new HttpEntity<>(addUdemyAuthHeaders()),
-                            Courses.class);
+            ResponseEntity<Courses> response = restTemplate.exchange(
+                getCoursesURL(),
+                HttpMethod.GET,
+                new HttpEntity<>(addUdemyAuthHeaders()),
+                Courses.class
+            );
             return Objects.requireNonNull(response.getBody());
         } catch (Exception e) {
             throw new IOException(e.getMessage());
@@ -98,19 +106,23 @@ public class CourseServiceImpl implements CourseService {
 
     private Course callMockCourseById(int id) {
         String mockedActivityCourseUrl = mockedEndpoint + "/udemy/courses/" + id;
-        ResponseEntity<Course> response = new RestTemplate(new SimpleClientHttpRequestFactory())
-                .exchange(mockedActivityCourseUrl, HttpMethod.GET, null, Course.class);
+        ResponseEntity<Course> response = restTemplate.exchange(
+                mockedActivityCourseUrl,
+                HttpMethod.GET,
+                null,
+                Course.class
+        );
         return Objects.requireNonNull(response.getBody());
     }
 
     private Course callUdemyCourseById(int id) throws IOException {
         try {
-            ResponseEntity<Course> response = new RestTemplate(new SimpleClientHttpRequestFactory())
-                    .exchange(
-                            getCourseURLWithId(id),
-                            HttpMethod.GET,
-                            new HttpEntity<>(addUdemyAuthHeaders()),
-                            Course.class);
+            ResponseEntity<Course> response =restTemplate.exchange(
+                getCourseURLWithId(id),
+                HttpMethod.GET,
+                new HttpEntity<>(addUdemyAuthHeaders()),
+                Course.class
+            );
             return Objects.requireNonNull(response.getBody());
         } catch (Exception e) {
             throw new IOException(e.getMessage());
