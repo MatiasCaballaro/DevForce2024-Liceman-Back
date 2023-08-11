@@ -86,8 +86,8 @@ public class UserServiceImpl implements UserService {
                 .stream()
                 .map(mapperUtils::MapperToUserWithoutTrainingDTO)
                 .collect(Collectors.toList());
-        if(users.isEmpty())
-            throw new IllegalArgumentException("No hay mas contenido para esta pagina");
+        if(users.isEmpty())throw new IllegalArgumentException("no hay mas contenido para esta pagina");
+
         return users;
     }
 

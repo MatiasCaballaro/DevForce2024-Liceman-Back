@@ -32,10 +32,10 @@ public class UserController {
     public ResponseEntity<ResponseDTO> getAllUsers(@RequestParam(defaultValue = "0") Integer pageNumber,
                                                    @RequestParam(defaultValue = "10") Integer pageSize,
                                                    @RequestParam(defaultValue = "id") String sortBy) {
-        try {
+        try{
             return ResponseEntity.ok().body(
                     new ResponseDTO(true, "Usuarios Obtenidos", userService.findAllUsers(PageRequest.of(pageNumber, pageSize, Sort.by(sortBy)))));
-        } catch (IllegalArgumentException e){
+        }catch (IllegalArgumentException e){
             return ResponseEntity.badRequest().body(
                     new ResponseDTO(false, e.getMessage(), null));
         }
