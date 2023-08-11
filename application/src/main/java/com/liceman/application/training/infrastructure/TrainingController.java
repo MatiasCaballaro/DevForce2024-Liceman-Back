@@ -8,6 +8,8 @@ import com.liceman.application.training.infrastructure.dto.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -36,8 +38,10 @@ public class TrainingController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('training:read')")
-    public ResponseEntity<ResponseDTO> getTrainings () {
-        return ResponseEntity.ok().body(new ResponseDTO(true, "Trainings Obtenidas", trainingService.getTrainings()
+    public ResponseEntity<ResponseDTO> getTrainings (@RequestParam(defaultValue = "0") Integer pageNumber,
+                                                     @RequestParam(defaultValue = "10") Integer pageSize,
+                                                     @RequestParam(defaultValue = "id") String sortBy) {
+        return ResponseEntity.ok().body(new ResponseDTO(true, "Trainings Obtenidas", trainingService.getTrainings(PageRequest.of(pageNumber, pageSize, Sort.by(sortBy)))
                 .stream()
                 .map(mapperUtils::mapperToTrainingUserResponseDTO)
                 .collect(Collectors.toList())));
