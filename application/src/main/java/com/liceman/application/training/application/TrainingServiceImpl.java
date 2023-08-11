@@ -6,16 +6,23 @@ import com.liceman.application.shared.exceptions.TrainingNotExistsException;
 import com.liceman.application.training.domain.Training;
 import com.liceman.application.training.domain.enums.Status;
 import com.liceman.application.training.domain.repository.TrainingRepository;
-import com.liceman.application.training.infrastructure.dto.*;
+import com.liceman.application.training.infrastructure.dto.TrainingCreationRequestDTO;
+import com.liceman.application.training.infrastructure.dto.UpdateTrainingByAdminDTO;
+import com.liceman.application.training.infrastructure.dto.UpdateTrainingByMentorDTO;
+import com.liceman.application.training.infrastructure.dto.UpdateTrainingByUserDTO;
 import com.liceman.application.user.domain.User;
-import com.liceman.application.user.domain.enums.*;
+import com.liceman.application.user.domain.enums.Area;
+import com.liceman.application.user.domain.enums.Role;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.liceman.application.training.domain.enums.Status.*;
@@ -41,19 +48,30 @@ public class TrainingServiceImpl implements TrainingService {
 
     @LoggedUser
     @Override
-    public List<Training> getTrainings (Pageable pageable) {
-        return getTrainingsAccordingToRole(UserContext.getUser(), pageable);
+    public List<Training> getTrainings (Integer pageNumber, Integer pageSize, String sortBy, String orderBy) throws IllegalArgumentException {
+        Sort sort = Sort.by(sortBy);
+        if ("DESC".equalsIgnoreCase(orderBy))
+            sort = sort.descending();
+        else if ("ASC".equalsIgnoreCase(orderBy))
+            sort = sort.ascending();
+        else
+            throw new IllegalArgumentException("Invalid orderBy value. It should be either ASC or DESC.");
+        return getTrainingsAccordingToRole(UserContext.getUser(), PageRequest.of(pageNumber, pageSize, sort));
     }
 
     private List<Training> getTrainingsAccordingToRole (User user, Pageable pageable) {
-
+        List<Training> trainings;
         if (user.getRole() == Role.USER) {
-            return getAllTrainingsByUser(user, pageable); // Get all trainings created by the logged user
+            trainings =  getAllTrainingsByUser(user, pageable); // Get all trainings created by the logged user
         } else if (user.getRole() == Role.MENTOR) {
-            return getAllTrainingsByArea(user.getArea(), pageable); // Get all trainings from the same area of the logged Mentor's area
+            trainings = getAllTrainingsByArea(user.getArea(), pageable); // Get all trainings from the same area of the logged Mentor's area
         } else {
-            return getAllTrainings(pageable); // Get all trainings (Admin)
+            trainings = getAllTrainings(pageable); // Get all trainings (Admin)
         }
+        if(trainings.isEmpty())
+            throw new IllegalArgumentException("no hay mas contenido para esta pagina");
+        else
+            return trainings;
     }
 
     private List<Training> getAllTrainingsByUser (User user, Pageable pageable) {

@@ -4,12 +4,13 @@ import com.liceman.application.shared.application.mappers.MapperUtils;
 import com.liceman.application.shared.exceptions.TrainingNotExistsException;
 import com.liceman.application.shared.infrastructure.ResponseDTO;
 import com.liceman.application.training.application.TrainingService;
-import com.liceman.application.training.infrastructure.dto.*;
+import com.liceman.application.training.infrastructure.dto.TrainingCreationRequestDTO;
+import com.liceman.application.training.infrastructure.dto.UpdateTrainingByAdminDTO;
+import com.liceman.application.training.infrastructure.dto.UpdateTrainingByMentorDTO;
+import com.liceman.application.training.infrastructure.dto.UpdateTrainingByUserDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -40,11 +41,15 @@ public class TrainingController {
     @PreAuthorize("hasAuthority('training:read')")
     public ResponseEntity<ResponseDTO> getTrainings (@RequestParam(defaultValue = "0") Integer pageNumber,
                                                      @RequestParam(defaultValue = "10") Integer pageSize,
-                                                     @RequestParam(defaultValue = "id") String sortBy) {
-        return ResponseEntity.ok().body(new ResponseDTO(true, "Trainings Obtenidas", trainingService.getTrainings(PageRequest.of(pageNumber, pageSize, Sort.by(sortBy)))
-                .stream()
-                .map(mapperUtils::mapperToTrainingUserResponseDTO)
-                .collect(Collectors.toList())));
+                                                     @RequestParam(defaultValue = "id") String sortBy,
+                                                     @RequestParam(defaultValue = "DESC") String orderBy) {
+        try {
+            return ResponseEntity.ok().body(new ResponseDTO(true, "Trainings Obtenidas", trainingService.getTrainings(pageNumber, pageSize, sortBy, orderBy)
+                    .stream()
+                    .map(mapperUtils::mapperToTrainingUserResponseDTO).collect(Collectors.toList())));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ResponseDTO(false, e.getMessage(), null));
+        }
     }
 
     @GetMapping("/{id}")

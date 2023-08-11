@@ -16,7 +16,8 @@ import com.liceman.application.user.infrastructure.dto.UserRequestDTO;
 import com.liceman.application.user.infrastructure.dto.UserResponseDTO;
 import com.liceman.application.user.infrastructure.dto.UserResponseWithoutTrainingDTO;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -81,8 +82,16 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public List<UserResponseWithoutTrainingDTO> findAllUsers (Pageable pageable) {
-        List<UserResponseWithoutTrainingDTO> users = userRepository.findAll(pageable)
+    public List<UserResponseWithoutTrainingDTO> findAllUsers(Integer pageNumber, Integer pageSize, String sortBy, String orderBy) throws IllegalArgumentException {
+        Sort sort = Sort.by(sortBy);
+        if ("DESC".equalsIgnoreCase(orderBy))
+            sort = sort.descending();
+        else if ("ASC".equalsIgnoreCase(orderBy))
+            sort = sort.ascending();
+        else
+            throw new IllegalArgumentException("Invalid orderBy value. It should be either ASC or DESC.");
+
+        List<UserResponseWithoutTrainingDTO> users = userRepository.findAll(PageRequest.of(pageNumber, pageSize, sort))
                 .stream()
                 .map(mapperUtils::MapperToUserWithoutTrainingDTO)
                 .collect(Collectors.toList());
