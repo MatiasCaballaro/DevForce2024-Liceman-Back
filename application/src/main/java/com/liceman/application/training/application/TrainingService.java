@@ -5,6 +5,7 @@ import com.liceman.application.training.infrastructure.dto.TrainingCreationReque
 import com.liceman.application.training.infrastructure.dto.UpdateTrainingByAdminDTO;
 import com.liceman.application.training.infrastructure.dto.UpdateTrainingByMentorDTO;
 import com.liceman.application.training.infrastructure.dto.UpdateTrainingByUserDTO;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -12,7 +13,7 @@ public interface TrainingService {
 
     Training createTraining (TrainingCreationRequestDTO trainingCreationRequestDTO);
 
-    List<Training> getTrainings ();
+    List<Training> getTrainings (Pageable pageable);
 
     Training getTrainingById (Long id) throws IllegalAccessException;
 

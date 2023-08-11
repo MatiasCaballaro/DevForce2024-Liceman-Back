@@ -12,6 +12,7 @@ import com.liceman.application.user.domain.enums.*;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -40,31 +41,31 @@ public class TrainingServiceImpl implements TrainingService {
 
     @LoggedUser
     @Override
-    public List<Training> getTrainings () {
-        return getTrainingsAccordingToRole(UserContext.getUser());
+    public List<Training> getTrainings (Pageable pageable) {
+        return getTrainingsAccordingToRole(UserContext.getUser(), pageable);
     }
 
-    private List<Training> getTrainingsAccordingToRole (User user) {
+    private List<Training> getTrainingsAccordingToRole (User user, Pageable pageable) {
 
         if (user.getRole() == Role.USER) {
-            return getAllTrainingsByUser(user); // Get all trainings created by the logged user
+            return getAllTrainingsByUser(user, pageable); // Get all trainings created by the logged user
         } else if (user.getRole() == Role.MENTOR) {
-            return getAllTrainingsByArea(user.getArea()); // Get all trainings from the same area of the logged Mentor's area
+            return getAllTrainingsByArea(user.getArea(), pageable); // Get all trainings from the same area of the logged Mentor's area
         } else {
-            return getAllTrainings(); // Get all trainings (Admin)
+            return getAllTrainings(pageable); // Get all trainings (Admin)
         }
     }
 
-    private List<Training> getAllTrainingsByUser (User user) {
-        return trainingRepository.findAllByUserIdIs(user);
+    private List<Training> getAllTrainingsByUser (User user, Pageable pageable) {
+        return trainingRepository.findAllByUserIdIs(user, pageable);
     }
 
-    private List<Training> getAllTrainingsByArea (Area area) {
-        return trainingRepository.findAllByArea(area);
+    private List<Training> getAllTrainingsByArea (Area area, Pageable pageable) {
+        return trainingRepository.findAllByArea(area, pageable);
     }
 
-    private List<Training> getAllTrainings () {
-        return trainingRepository.findAll();
+    private List<Training> getAllTrainings (Pageable pageable) {
+        return trainingRepository.findAll(pageable).stream().toList();
     }
 
     @LoggedUser

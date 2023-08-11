@@ -4,6 +4,7 @@ import com.liceman.application.security.infrastructure.dto.AuthenticationRespons
 import com.liceman.application.user.infrastructure.dto.UserRequestDTO;
 import com.liceman.application.user.infrastructure.dto.UserResponseDTO;
 import com.liceman.application.user.infrastructure.dto.UserResponseWithoutTrainingDTO;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,7 +13,7 @@ public interface UserService {
 
     AuthenticationResponse createUser (UserRequestDTO userRequest);
 
-    List<UserResponseDTO> findAllUsers ();
+    List<UserResponseWithoutTrainingDTO> findAllUsers (Pageable pageable);
 
     Optional<UserResponseDTO> getUserById (Long id);
 

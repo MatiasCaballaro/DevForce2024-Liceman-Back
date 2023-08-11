@@ -16,6 +16,7 @@ import com.liceman.application.user.infrastructure.dto.UserRequestDTO;
 import com.liceman.application.user.infrastructure.dto.UserResponseDTO;
 import com.liceman.application.user.infrastructure.dto.UserResponseWithoutTrainingDTO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -80,11 +81,14 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public List<UserResponseDTO> findAllUsers () {
-        return userRepository.findAll()
+    public List<UserResponseWithoutTrainingDTO> findAllUsers (Pageable pageable) {
+        List<UserResponseWithoutTrainingDTO> users = userRepository.findAll(pageable)
                 .stream()
-                .map(mapperUtils::MapperToUserDTO)
+                .map(mapperUtils::MapperToUserWithoutTrainingDTO)
                 .collect(Collectors.toList());
+        if(users.isEmpty())
+            throw new IllegalArgumentException("No hay mas contenido para esta pagina");
+        return users;
     }
 
     @Override
