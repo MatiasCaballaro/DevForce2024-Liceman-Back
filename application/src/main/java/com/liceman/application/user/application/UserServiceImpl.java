@@ -82,11 +82,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserResponseWithoutTrainingDTO> findAllUsers (Pageable pageable) {
-        //TODO: Agregar validación por si pido una página mayor del contenido que tengo...
-        return userRepository.findAll(pageable)
+        List<UserResponseWithoutTrainingDTO> users = userRepository.findAll(pageable)
                 .stream()
                 .map(mapperUtils::MapperToUserWithoutTrainingDTO)
                 .collect(Collectors.toList());
+        if(users.isEmpty())throw new IllegalArgumentException("no hay mas contenido para esta pagina");
+
+        return users;
     }
 
     @Override
