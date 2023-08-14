@@ -1,6 +1,6 @@
 package com.liceman.application.security.domain.token;
 
-import com.liceman.application.usuario.domain.User;
+import com.liceman.application.user.domain.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

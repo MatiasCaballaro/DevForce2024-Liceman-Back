@@ -1,6 +1,6 @@
 package com.liceman.application.security.application;
 
-import com.liceman.application.security.domain.token.TokenJPARepository;
+import com.liceman.application.security.domain.token.TokenRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class LogoutService implements LogoutHandler {
 
-    private final TokenJPARepository tokenJPARepository;
+    private final TokenRepository tokenRepository;
 
     @Override
     public void logout (
@@ -27,12 +27,12 @@ public class LogoutService implements LogoutHandler {
             return;
         }
         jwt = authHeader.substring(7);
-        var storedToken = tokenJPARepository.findByToken(jwt)
+        var storedToken = tokenRepository.findByToken(jwt)
                 .orElse(null);
         if (storedToken != null) {
             storedToken.setExpired(true);
             storedToken.setRevoked(true);
-            tokenJPARepository.save(storedToken);
+            tokenRepository.save(storedToken);
             SecurityContextHolder.clearContext();
         }
     }

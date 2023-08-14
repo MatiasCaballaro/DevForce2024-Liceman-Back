@@ -1,7 +1,7 @@
 package com.liceman.application.shared.application.loggeduser;
 
-import com.liceman.application.usuario.domain.User;
-import com.liceman.application.usuario.domain.repository.UserRepository;
+import com.liceman.application.user.domain.User;
+import com.liceman.application.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
@@ -24,7 +24,7 @@ public class LoggedUserAspect {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User loggedUser = UserContext.getUser();
 
-        if (loggedUser == null) {
+           if (loggedUser == null || !loggedUser.getEmail().equals(authentication.getName())) {
             loggedUser = userRepository.findByEmail(authentication.getName())
                     .orElseThrow(() -> new NoSuchElementException("Usuario no encontrado con el correo electrónico: " + authentication.getName()));
             UserContext.setUser(loggedUser);

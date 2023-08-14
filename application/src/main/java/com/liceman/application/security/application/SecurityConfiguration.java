@@ -1,5 +1,6 @@
 package com.liceman.application.security.application;
 
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,10 +17,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import static com.liceman.application.usuario.domain.enums.Permission.*;
-import static com.liceman.application.usuario.domain.enums.Role.ADMIN;
-import static com.liceman.application.usuario.domain.enums.Role.MENTOR;
-import static org.springframework.http.HttpMethod.*;
+import static com.liceman.application.user.domain.enums.Role.ADMIN;
+import static com.liceman.application.user.domain.enums.Role.MENTOR;
 
 @Configuration
 @EnableWebSecurity
@@ -33,9 +32,10 @@ public class SecurityConfiguration {
 
 
     @Bean
-    public CorsConfigurationSource corsConfigurationSource () {
+    public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.addAllowedOrigin("http://localhost:5173");
+        configuration.addAllowedOrigin("http://127.0.0.1:5173");
         configuration.addAllowedMethod("*");
         configuration.addAllowedHeader("*");
         configuration.setAllowCredentials(true);
@@ -45,8 +45,9 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain (HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .headers().frameOptions().sameOrigin().and()
                 .csrf()
                 .disable()
                 .cors().configurationSource(corsConfigurationSource()) // Habilitar CORS .and()
@@ -66,19 +67,8 @@ public class SecurityConfiguration {
                         "/swagger-ui.html",
                         "/h2-ui/**",
                         "/h2-console/**"
-                )
-                .permitAll()
-
-
+                ).permitAll()
                 .requestMatchers("/api/v1/mentor/**").hasAnyRole(ADMIN.name(), MENTOR.name())
-
-
-                .requestMatchers(GET, "/api/v1/mentor/**").hasAnyAuthority(ADMIN_READ.name(), MENTOR_READ.name())
-                .requestMatchers(POST, "/api/v1/mentor/**").hasAnyAuthority(ADMIN_CREATE.name(), MENTOR_CREATE.name())
-                .requestMatchers(PUT, "/api/v1/mentor/**").hasAnyAuthority(ADMIN_UPDATE.name(), MENTOR_UPDATE.name())
-                .requestMatchers(DELETE, "/api/v1/mentor/**").hasAnyAuthority(ADMIN_DELETE.name(), MENTOR_DELETE.name())
-
-
                 .anyRequest()
                 .authenticated()
                 .and()

@@ -32,6 +32,6 @@ Java 17+ JDK
 - [x] Set up Swagger
 - [x] Set up a demo for Api's access by using the roles given in sample data
 - [x] Set up a CRUD service for User      
-- [x] Create Solicitud class
-- [x] Create SolicitudService according to bussiness logic
-- [x] Create the ApiRest to test the BL for SolicitudService
+- [x] Create Training class
+- [x] Create TrainingService according to bussiness logic
+- [x] Create the ApiRest to test the BL for TrainingService
