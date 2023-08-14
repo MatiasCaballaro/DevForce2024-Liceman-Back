@@ -29,10 +29,11 @@ public class UserController {
     @PreAuthorize("hasAuthority('user:read')")
     public ResponseEntity<ResponseDTO> getAllUsers(@RequestParam(defaultValue = "0") Integer pageNumber,
                                                    @RequestParam(defaultValue = "10") Integer pageSize,
-                                                   @RequestParam(defaultValue = "id") String sortBy) {
+                                                   @RequestParam(defaultValue = "id") String sortBy,
+                                                   @RequestParam(defaultValue = "DESC") String orderBy) {
         try{
             return ResponseEntity.ok().body(
-                    new ResponseDTO(true, "Usuarios Obtenidos", userService.findAllUsers(PageRequest.of(pageNumber, pageSize, Sort.by(sortBy)))));
+                    new ResponseDTO(true, "Usuarios Obtenidos", userService.findAllUsers(pageNumber, pageSize, sortBy, orderBy)));
         }catch (IllegalArgumentException e){
             return ResponseEntity.badRequest().body(
                     new ResponseDTO(false, e.getMessage(), null));
