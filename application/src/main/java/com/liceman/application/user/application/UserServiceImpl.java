@@ -16,6 +16,8 @@ import com.liceman.application.user.infrastructure.dto.UserRequestDTO;
 import com.liceman.application.user.infrastructure.dto.UserResponseDTO;
 import com.liceman.application.user.infrastructure.dto.UserResponseWithoutTrainingDTO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -79,11 +81,22 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public List<UserResponseDTO> findAllUsers () {
-        return userRepository.findAll()
+    public List<UserResponseWithoutTrainingDTO> findAllUsers(Integer pageNumber, Integer pageSize, String sortBy, String orderBy) throws IllegalArgumentException {
+        Sort sort = Sort.by(sortBy);
+        if ("DESC".equalsIgnoreCase(orderBy))
+            sort = sort.descending();
+        else if ("ASC".equalsIgnoreCase(orderBy))
+            sort = sort.ascending();
+        else
+            throw new IllegalArgumentException("Invalid orderBy value. It should be either ASC or DESC.");
+
+        List<UserResponseWithoutTrainingDTO> users = userRepository.findAll(PageRequest.of(pageNumber, pageSize, sort))
                 .stream()
-                .map(mapperUtils::mapperToUserDTO)
+                .map(mapperUtils::mapperToUserWithoutTrainingDTO)
                 .collect(Collectors.toList());
+        if(users.isEmpty())
+            throw new IllegalArgumentException("no hay mas contenido para esta pagina");
+        return users;
     }
 
     @Override
@@ -97,8 +110,8 @@ public class UserServiceImpl implements UserService {
     public Optional<UserResponseWithoutTrainingDTO> getLoggedUser(){
         return Optional.ofNullable(mapperUtils.mapperToUserWithoutTrainingDTO(UserContext.getUser()));
     }
-    //El método UpdateOwnUser no involucra el cambio de mail
 
+    //El método UpdateOwnUser no involucra el cambio de mail
     @LoggedUser
     @Override
     public UserResponseDTO updateOwnUser (UserRequestDTO userRequestDTO) {
@@ -106,6 +119,7 @@ public class UserServiceImpl implements UserService {
         UpdateUserData(userRequestDTO, loggedUser);
         return mapperUtils.mapperToUserDTO(userRepository.save(loggedUser));
     }
+
     private void UpdateUserData (UserRequestDTO userRequestDTO, User user) {
         user.setFirstname(userRequestDTO.getFirstname());
         user.setLastname(userRequestDTO.getLastname());
@@ -120,8 +134,6 @@ public class UserServiceImpl implements UserService {
     public void deleteUserbyId (Long id) {
         userRepository.deleteById(id);
     }
-
-
 
 
 }

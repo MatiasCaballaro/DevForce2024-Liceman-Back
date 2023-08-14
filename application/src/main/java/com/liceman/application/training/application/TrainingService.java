@@ -12,8 +12,8 @@ public interface TrainingService {
 
     Training createTraining (TrainingCreationRequestDTO trainingCreationRequestDTO);
 
-    List<Training> getTrainingsAccordingToRole();
-;
+    List<Training> getTrainings (Integer pageNumber, Integer pageSize, String sortBy, String orderBy);
+
     Training getTrainingById (Long id) throws IllegalAccessException;
 
     Training mentorUpdateTraining (Long id, UpdateTrainingByMentorDTO updateTrainingByMentorDTO) throws Exception;

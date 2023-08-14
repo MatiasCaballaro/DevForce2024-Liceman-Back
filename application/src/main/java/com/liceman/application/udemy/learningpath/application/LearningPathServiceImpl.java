@@ -2,7 +2,9 @@ package com.liceman.application.udemy.learningpath.application;
 
 import com.liceman.application.udemy.learningpath.domain.LearningPath;
 import com.liceman.application.udemy.learningpath.domain.LearningPathResult;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.binary.Base64;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -16,6 +18,7 @@ import java.io.IOException;
 import java.util.Objects;
 
 @Service
+@RequiredArgsConstructor
 public class LearningPathServiceImpl implements LearningPathService {
 
     @Value("${mock.udemy}")
@@ -36,6 +39,7 @@ public class LearningPathServiceImpl implements LearningPathService {
     @Value("${udemy.client.secret}")
     String secret;
 
+    private final RestTemplate restTemplate;
 
     @Override
     public LearningPath getLearningPaths() throws IOException {
@@ -47,8 +51,12 @@ public class LearningPathServiceImpl implements LearningPathService {
 
     private LearningPath callMockLearningPath() {
         String mockedActivityLearningPathUrl = mockedEndpoint + "/udemy/learning-paths";
-        ResponseEntity<LearningPath> response = new RestTemplate(new SimpleClientHttpRequestFactory())
-                .exchange(mockedActivityLearningPathUrl, HttpMethod.GET, null, LearningPath.class);
+        ResponseEntity<LearningPath> response = restTemplate.exchange(
+                mockedActivityLearningPathUrl,
+                HttpMethod.GET,
+                null,
+                LearningPath.class
+        );
         return Objects.requireNonNull(response.getBody());
     }
 
@@ -64,12 +72,12 @@ public class LearningPathServiceImpl implements LearningPathService {
 
     private LearningPath callUdemyLearningPath() throws IOException {
         try {
-            ResponseEntity<LearningPath> response = new RestTemplate(new SimpleClientHttpRequestFactory())
-                    .exchange(
-                            getLearningPath(),
-                            HttpMethod.GET,
-                            new HttpEntity<>(addUdemyAuthHeaders()),
-                            LearningPath.class);
+            ResponseEntity<LearningPath> response = restTemplate.exchange(
+                getLearningPath(),
+                HttpMethod.GET,
+                new HttpEntity<>(addUdemyAuthHeaders()),
+                LearningPath.class
+            );
             return Objects.requireNonNull(response.getBody());
         } catch (Exception e) {
             throw new IOException(e.getMessage());
@@ -96,19 +104,23 @@ public class LearningPathServiceImpl implements LearningPathService {
 
     private LearningPathResult callMockLearningPathByID(int id) {
         String mockedActivityLearningPathUrl = mockedEndpoint + "/udemy/learning-paths/"+id;
-        ResponseEntity<LearningPathResult> response = new RestTemplate(new SimpleClientHttpRequestFactory())
-                .exchange(mockedActivityLearningPathUrl, HttpMethod.GET, null, LearningPathResult.class);
+        ResponseEntity<LearningPathResult> response = restTemplate.exchange(
+                mockedActivityLearningPathUrl,
+                HttpMethod.GET,
+                null,
+                LearningPathResult.class
+        );
         return Objects.requireNonNull(response.getBody());
     }
 
     private LearningPathResult callUdemyLearningPathByID(int id) throws IOException {
         try {
-            ResponseEntity<LearningPathResult> response = new RestTemplate(new SimpleClientHttpRequestFactory())
-                    .exchange(
-                            getLearningPathURLWithId(id),
-                            HttpMethod.GET,
-                            new HttpEntity<>(addUdemyAuthHeaders()),
-                            LearningPathResult.class);
+            ResponseEntity<LearningPathResult> response = restTemplate.exchange(
+                    getLearningPathURLWithId(id),
+                    HttpMethod.GET,
+                    new HttpEntity<>(addUdemyAuthHeaders()),
+                    LearningPathResult.class
+            );
             return Objects.requireNonNull(response.getBody());
         } catch (Exception e) {
             throw new IOException(e.getMessage());

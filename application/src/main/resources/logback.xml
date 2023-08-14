@@ -1,0 +1,37 @@
+<configuration>
+    <!-- TODO: Falta agregar el UserDetails al logger -->
+    <property name="logPattern" value="%date{yyyy-MM-dd HH:mm:ss.SSS}\t[%thread]\t%-5level\t%-80logger{80}\t-\t%msg%n"/>
+
+    <!-- Acá muestro el log en consola -->
+    <appender name="consoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <!-- Usar la propiedad definida -->
+            <pattern>${logPattern}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Acá muestro el log en el archivo -->
+    <appender name="fileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/liceman.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- Rollover cada día -->
+            <fileNamePattern>logs/liceman-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- Límite de 50MB por archivo -->
+            <maxFileSize>50MB</maxFileSize>
+            <!-- Contador de archivos -->
+            <maxHistory>30</maxHistory> <!-- Número máximo de archivos históricos -->
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <contextName>logs</contextName>
+                <timeBasedFileNamePattern>liceman-%d{yyyy-MM-dd}.%i.log</timeBasedFileNamePattern>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${logPattern}</pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="fileAppender" />
+        <appender-ref ref="consoleAppender" />
+    </root>
+</configuration>

@@ -12,7 +12,7 @@ public interface UserService {
 
     AuthenticationResponse createUser (UserRequestDTO userRequest);
 
-    List<UserResponseDTO> findAllUsers ();
+    List<UserResponseWithoutTrainingDTO> findAllUsers (Integer pageNumber, Integer pageSize, String sortBy, String orderBy);
 
     Optional<UserResponseDTO> getUserById (Long id);
 

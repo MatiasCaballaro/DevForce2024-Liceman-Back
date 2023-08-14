@@ -41,6 +41,7 @@ public class StatisticsServiceImpl implements StatisticsService {
     @Value("${udemy.client.secret}")
     String secret;
 
+    private final RestTemplate restTemplate;
 
     @Override
     public ActivityResult getUserActivity(String email) throws IOException {
@@ -52,20 +53,23 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     private ActivityResult callMockActivity() {
         String mockedActivityUrl = mockedEndpoint + "/udemy/activity";
-        ResponseEntity<Activity> response = new RestTemplate(new SimpleClientHttpRequestFactory())
-                .exchange(mockedActivityUrl, HttpMethod.GET, null, Activity.class);
+        ResponseEntity<Activity> response = restTemplate.exchange(
+                mockedActivityUrl,
+                HttpMethod.GET,
+                null,
+                Activity.class
+        );
         return Objects.requireNonNull(response.getBody()).getResults().stream().findFirst().orElse(null);
     }
 
     private ActivityResult callUdemyActivity(String email) throws IOException {
         try {
-            ResponseEntity<Activity> response = new RestTemplate(new SimpleClientHttpRequestFactory())
-                    .exchange(
-                            getActivityUrlWith(email),
-                            HttpMethod.GET,
-                            new HttpEntity<>(addUdemyAuthHeaders()),
-                            Activity.class);
-
+            ResponseEntity<Activity> response = restTemplate.exchange(
+                    getActivityCoursesUrlWith(email),
+                    HttpMethod.GET,
+                    new HttpEntity<>(addUdemyAuthHeaders()),
+                    Activity.class
+            );
             return Objects.requireNonNull(response.getBody()).getResults().stream().findFirst().orElse(null);
         } catch (Exception e) {
             throw new IOException(e.getMessage());
@@ -101,20 +105,23 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     private List<ActivityCourseResult> callMockActivityCourses() {
         String mockedActivityCourseUrl = mockedEndpoint + "/udemy/activity-course";
-        ResponseEntity<ActivityCourse> response = new RestTemplate(new SimpleClientHttpRequestFactory())
-                .exchange(mockedActivityCourseUrl, HttpMethod.GET, null, ActivityCourse.class);
+        ResponseEntity<ActivityCourse> response = restTemplate.exchange(
+                mockedActivityCourseUrl,
+                HttpMethod.GET,
+                null,
+                ActivityCourse.class
+        );
         return Objects.requireNonNull(response.getBody()).getResults();
     }
 
     private List<ActivityCourseResult> callUdemyActivityCourses(String email) throws IOException {
         try {
-            ResponseEntity<ActivityCourse> response = new RestTemplate(new SimpleClientHttpRequestFactory())
-                    .exchange(
-                            getActivityCoursesUrlWith(email),
-                            HttpMethod.GET,
-                            new HttpEntity<>(addUdemyAuthHeaders()),
-                            ActivityCourse.class);
-
+            ResponseEntity<ActivityCourse> response = restTemplate.exchange(
+                getActivityCoursesUrlWith(email),
+                HttpMethod.GET,
+                new HttpEntity<>(addUdemyAuthHeaders()),
+                ActivityCourse.class
+            );
             return Objects.requireNonNull(response.getBody()).getResults();
         } catch (Exception e) {
             throw new IOException(e.getMessage());

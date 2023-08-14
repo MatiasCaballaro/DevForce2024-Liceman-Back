@@ -17,9 +17,13 @@ import com.liceman.application.user.domain.enums.Role;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.liceman.application.training.domain.enums.Status.*;
@@ -51,30 +55,44 @@ public class TrainingServiceImpl implements TrainingService {
         return trainingRepository.save(newTraining);
     }
 
-
     @LoggedUser
     @Override
-    public List<Training> getTrainingsAccordingToRole () {
-        User user = UserContext.getUser();
+    public List<Training> getTrainings (Integer pageNumber, Integer pageSize, String sortBy, String orderBy) throws IllegalArgumentException {
+        Sort sort = Sort.by(sortBy);
+        if ("DESC".equalsIgnoreCase(orderBy))
+            sort = sort.descending();
+        else if ("ASC".equalsIgnoreCase(orderBy))
+            sort = sort.ascending();
+        else
+            throw new IllegalArgumentException("Invalid orderBy value. It should be either ASC or DESC.");
+        return getTrainingsAccordingToRole(UserContext.getUser(), PageRequest.of(pageNumber, pageSize, sort));
+    }
+
+    private List<Training> getTrainingsAccordingToRole (User user, Pageable pageable) {
+        List<Training> trainings;
         if (user.getRole() == Role.USER) {
-            return getAllTrainingsByUser(user); // Get all trainings created by the logged user
+            trainings =  getAllTrainingsByUser(user, pageable); // Get all trainings created by the logged user
         } else if (user.getRole() == Role.MENTOR) {
-            return getAllTrainingsByArea(user.getArea()); // Get all trainings from the same area of the logged Mentor's area
+            trainings = getAllTrainingsByArea(user.getArea(), pageable); // Get all trainings from the same area of the logged Mentor's area
         } else {
-            return getAllTrainings(); // Get all trainings (Admin)
+            trainings = getAllTrainings(pageable); // Get all trainings (Admin)
         }
+        if(trainings.isEmpty())
+            throw new IllegalArgumentException("no hay mas contenido para esta pagina");
+        else
+            return trainings;
     }
 
-    private List<Training> getAllTrainingsByUser (User user) {
-        return trainingRepository.findAllByUserIdOrderByIdDesc(user);
+    private List<Training> getAllTrainingsByUser (User user, Pageable pageable) {
+        return trainingRepository.findAllByUserIdIs(user, pageable);
     }
 
-    private List<Training> getAllTrainingsByArea (Area area) {
-        return trainingRepository.findAllByAreaOrderByIdDesc(area);
+    private List<Training> getAllTrainingsByArea (Area area, Pageable pageable) {
+        return trainingRepository.findAllByArea(area, pageable);
     }
 
-    private List<Training> getAllTrainings () {
-        return trainingRepository.findAllOrderByIdDesc();
+    private List<Training> getAllTrainings (Pageable pageable) {
+        return trainingRepository.findAll(pageable).stream().toList();
     }
 
     @LoggedUser
