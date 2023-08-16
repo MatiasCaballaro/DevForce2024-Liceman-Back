@@ -23,4 +23,5 @@ public interface UserService {
     Optional<UserResponseWithoutTrainingDTO> getLoggedUser();
 
 
+
 }

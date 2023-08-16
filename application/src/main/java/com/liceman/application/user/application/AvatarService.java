@@ -12,5 +12,5 @@ public interface AvatarService {
     void uploadAvatar (MultipartFile file) throws IOException;
 
     @LoggedUser
-    String getAvatar() throws FileNotFoundException;
+    String getAvatar(Long id) throws FileNotFoundException;
 }
