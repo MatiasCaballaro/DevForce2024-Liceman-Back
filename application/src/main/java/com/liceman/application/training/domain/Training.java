@@ -28,6 +28,8 @@ public class Training {
     @Enumerated(EnumType.STRING)
     private Area area;
 
+    private String title;
+
     @Column(name = "creation_date")
     private LocalDateTime creationDate;
 
@@ -41,15 +43,6 @@ public class Training {
 
     @Enumerated(EnumType.STRING)
     private Status status;
-
-    /*//TODO: Ver si hacemos List<String> del comentario, quiza hacer una clase Comentario
-    @Column(name = "user_comment")
-    private String userComment;
-
-    //TODO: Ver si hacemos List<String> del comentario, quiza hacer una clase Comentario
-    @Column(name = "mentor_comment")
-    private String mentorComment;*/
-
 
     @OneToMany(mappedBy = "training_id", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     List<Comment> comments = new ArrayList<>();

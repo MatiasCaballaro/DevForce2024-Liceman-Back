@@ -24,6 +24,8 @@ public class TrainingDTO {
     @Enumerated(EnumType.STRING)
     private Area area;
 
+    private String title;
+
     private LocalDateTime creationDate;
 
     private LocalDateTime approvedDate;

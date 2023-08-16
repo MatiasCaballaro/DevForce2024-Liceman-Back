@@ -17,6 +17,8 @@ public class TrainingCreationRequestDTO {
     @Enumerated(EnumType.STRING)
     private Area area;
 
+    private String title;
+
     private String comment;
 
 }

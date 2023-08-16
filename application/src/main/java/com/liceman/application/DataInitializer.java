@@ -127,24 +127,28 @@ public class DataInitializer implements CommandLineRunner {
 
             TrainingCreationRequestDTO training1 = TrainingCreationRequestDTO.builder()
                     .comment("Necesito estudiar JAVA")
+                    .title("Estudiar JAVA")
                     .area(Area.BACKEND)
                     .build();
             System.out.println("Training1 (BACKEND)" + createTraining(training1,user1));
 
             TrainingCreationRequestDTO training2 = TrainingCreationRequestDTO.builder()
                     .comment("Necesito estudiar SPRING BOOT")
+                    .title("Capacitación en SPRING BOOT")
                     .area(Area.BACKEND)
                     .build();
             System.out.println("Training1 (BACKEND)" + createTraining(training2,user1));
 
             TrainingCreationRequestDTO training3 = TrainingCreationRequestDTO.builder()
                     .comment("Necesito estudiar REACT")
+                    .title("Estudiar REACT")
                     .area(Area.FRONTEND)
                     .build();
             System.out.println("Training1 (FRONTEND)" + createTraining(training3,user1));
 
             TrainingCreationRequestDTO training4 = TrainingCreationRequestDTO.builder()
                     .comment("Necesito estudiar SQL")
+                    .title("Capacitarme en SQL")
                     .area(Area.DATA)
                     .build();
             System.out.println("Training1 (BACKEND)" + createTraining(training4,user2));
@@ -199,6 +203,7 @@ public class DataInitializer implements CommandLineRunner {
     private Training createTraining(TrainingCreationRequestDTO trainingCreationRequestDTO, UserRequestDTO userDTO) {
         Training newTraining = new Training();
         newTraining.setArea(trainingCreationRequestDTO.getArea());
+        newTraining.setTitle(trainingCreationRequestDTO.getTitle());
 
         // Crear el comentario
         Comment comment = Comment.builder()

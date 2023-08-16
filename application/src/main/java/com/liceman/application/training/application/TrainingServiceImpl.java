@@ -40,6 +40,7 @@ public class TrainingServiceImpl implements TrainingService {
     public Training createTraining(TrainingCreationRequestDTO trainingCreationRequestDTO) {
         Training newTraining = new Training();
         newTraining.setArea(trainingCreationRequestDTO.getArea());
+        newTraining.setTitle(trainingCreationRequestDTO.getTitle());
         newTraining.setUserId(UserContext.getUser());
         newTraining.setCreationDate(LocalDateTime.now());
         newTraining.setStatus(Status.PENDIENTE_MENTOR);

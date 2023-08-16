@@ -47,6 +47,7 @@ public class MapperUtilsImpl implements MapperUtils {
         TrainingDTO trainingDTO = TrainingDTO.builder()
                 .id(training.getId())
                 .area(training.getArea())
+                .title(training.getTitle())
                 .creationDate(training.getCreationDate())
                 .status(training.getStatus())
                 .comments(training.getComments().stream().map(this::mapperToCommentDTO).collect(Collectors.toList()))
