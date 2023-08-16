@@ -6,6 +6,7 @@ import com.liceman.application.training.infrastructure.dto.CommentDTO;
 import com.liceman.application.training.infrastructure.dto.TrainingDTO;
 import com.liceman.application.user.domain.User;
 import com.liceman.application.user.infrastructure.dto.UserResponseDTO;
+import com.liceman.application.user.infrastructure.dto.UserResponseWithAvatarDTO;
 import com.liceman.application.user.infrastructure.dto.UserResponseWithoutTrainingDTO;
 import org.springframework.stereotype.Service;
 
@@ -76,5 +77,19 @@ public class MapperUtilsImpl implements MapperUtils {
                 .created_at(comment.getCreated_at())
                 .build();
         return commentDTO;
+    }
+
+    @Override
+    public UserResponseWithAvatarDTO mapperToUserResponseWithAvatarDTO(User user) {
+        UserResponseWithAvatarDTO userDTO = new UserResponseWithAvatarDTO();
+        userDTO.setId(user.getId());
+        userDTO.setFirstname(user.getFirstname());
+        userDTO.setLastname(user.getLastname());
+        userDTO.setRole(user.getRole().toString());
+        userDTO.setPhone(user.getPhone());
+        userDTO.setEmail(user.getEmail());
+        userDTO.setHasTeams(user.getHasTeams());
+
+        return userDTO;
     }
 }

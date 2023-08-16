@@ -82,12 +82,11 @@ public class AvatarServiceImpl implements AvatarService{
         }
     }
 
-    @LoggedUser
     @Override
-    public String getAvatar() throws FileNotFoundException {
+    public String getAvatar(Long id) throws FileNotFoundException {
         InputStream inputStream = null;
         try{
-            File directory = new File(BaseRoute + "/" + UserContext.getUser().getId());
+            File directory = new File(BaseRoute + "/" + id);
             File[] files = directory.listFiles();
             for (File archivo : files) {
                 String filename= archivo.getName();
