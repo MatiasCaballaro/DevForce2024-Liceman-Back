@@ -6,6 +6,7 @@ import com.liceman.application.training.infrastructure.dto.CommentDTO;
 import com.liceman.application.training.infrastructure.dto.TrainingDTO;
 import com.liceman.application.user.domain.User;
 import com.liceman.application.user.infrastructure.dto.UserResponseDTO;
+import com.liceman.application.user.infrastructure.dto.UserResponseWithAvatarDTO;
 import com.liceman.application.user.infrastructure.dto.UserResponseWithoutTrainingDTO;
 
 public interface MapperUtils {
@@ -18,5 +19,7 @@ public interface MapperUtils {
 
     CommentDTO mapperToCommentDTO (Comment comment);
 
-    
+    UserResponseWithAvatarDTO mapperToUserResponseWithAvatarDTO(User user);
+
+
 }

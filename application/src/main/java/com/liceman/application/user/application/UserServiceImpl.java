@@ -14,6 +14,7 @@ import com.liceman.application.user.domain.enums.Role;
 import com.liceman.application.user.domain.repository.UserRepository;
 import com.liceman.application.user.infrastructure.dto.UserRequestDTO;
 import com.liceman.application.user.infrastructure.dto.UserResponseDTO;
+import com.liceman.application.user.infrastructure.dto.UserResponseWithAvatarDTO;
 import com.liceman.application.user.infrastructure.dto.UserResponseWithoutTrainingDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -32,6 +33,8 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     private final TokenRepository tokenRepository;
+
+    private final AvatarService avatarService;
 
     private final MapperUtils mapperUtils;
 
@@ -99,16 +102,25 @@ public class UserServiceImpl implements UserService {
         return users;
     }
 
+    @LoggedUser
+    @Override
+    public Optional<UserResponseWithAvatarDTO> getLoggedUser(){
+        UserResponseWithAvatarDTO userDto=  null;
+        try{
+            userDto = mapperUtils.mapperToUserResponseWithAvatarDTO(UserContext.getUser());
+            userDto.setAvatar(avatarService.getAvatar(UserContext.getUser().getId()));
+        }catch (Exception e){
+            if(userDto != null)
+                userDto.setAvatar(null);
+        }
+
+        return Optional.ofNullable(userDto);
+    }
+
     @Override
     public Optional<UserResponseDTO> getUserById (Long id) {
         Optional<User> user = Optional.ofNullable(userRepository.findById(id).orElseThrow(RuntimeException::new));
         return user.map(mapperUtils::mapperToUserDTO);
-    }
-
-    @LoggedUser
-    @Override
-    public Optional<UserResponseWithoutTrainingDTO> getLoggedUser(){
-        return Optional.ofNullable(mapperUtils.mapperToUserWithoutTrainingDTO(UserContext.getUser()));
     }
 
     //El método UpdateOwnUser no involucra el cambio de mail
