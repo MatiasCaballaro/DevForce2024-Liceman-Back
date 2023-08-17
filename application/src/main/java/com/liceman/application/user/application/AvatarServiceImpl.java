@@ -3,11 +3,14 @@ package com.liceman.application.user.application;
 import com.liceman.application.shared.application.loggeduser.LoggedUser;
 import com.liceman.application.shared.application.loggeduser.UserContext;
 import com.liceman.application.shared.exceptions.NotValidImageFormatException;
+import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
 import java.io.*;
+import java.nio.file.Files;
 import java.util.Base64;
 import java.util.Objects;
 
@@ -18,13 +21,14 @@ public class AvatarServiceImpl implements AvatarService{
 
     @LoggedUser
     @Override
-    public void uploadAvatar(MultipartFile file) throws IOException {
+    public void uploadAvatar(String image) throws IOException {
         try{
-            if (!validateNotEmptyAndContentType(file)){
+
+            if (!validateNotEmptyAndContentType(image) || !isImage(image)){
                throw new NotValidImageFormatException();
             }
             deleteOldAvatars();
-            createNewAvatar(file);
+            createNewAvatar(image);
         }
         catch (NotValidImageFormatException e){
             throw new NotValidImageFormatException();
@@ -34,13 +38,14 @@ public class AvatarServiceImpl implements AvatarService{
         }
     }
 
-    boolean validateNotEmptyAndContentType (MultipartFile file) {
-        return (!file.isEmpty()
-                && Objects.requireNonNull(file.getContentType()).contains("image/"))
-                && (file.getContentType().contains("jpg")
-                || file.getContentType().contains("jpeg")
-                || file.getContentType().contains("png")
-                || file.getContentType().contains("webp"));
+
+    boolean validateNotEmptyAndContentType (String image) {
+        return (!image.isEmpty()
+                && Objects.requireNonNull(image).contains("image/"))
+                && (image.contains("jpg")
+                || image.contains("jpeg")
+                || image.contains("png")
+                || image.contains("webp"));
     }
     void deleteOldAvatars () {
         String basePath = "C:/Avatares/" + UserContext.getUser().getId();
@@ -65,16 +70,35 @@ public class AvatarServiceImpl implements AvatarService{
             }
         }
     }
+    private String getContent(String image){
+        String data;
+        data = image.substring(23);
+        return data;
+    }
 
-    void createNewAvatar(MultipartFile file) throws IOException {
+    public boolean isImage(String imageData){
+        try {
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(
+                    Base64.getDecoder().decode(getContent(imageData).getBytes()));
+            ImageIO.read(inputStream);
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+    void createNewAvatar(String image) throws IOException {
         OutputStream outputStream = null;
         try {
+
             new File(BaseRoute + UserContext.getUser().getId()).mkdirs();
-            String extension = Objects.requireNonNull(file.getContentType()).substring(file.getContentType().indexOf("/") + 1);
             File file1 = new File(BaseRoute + UserContext.getUser().getId() + "/" +
-                    "avatar-" + UserContext.getUser().getId() + "." + extension);
+                    "avatar-" + UserContext.getUser().getId() + ".jpeg");
             outputStream = new BufferedOutputStream(new FileOutputStream(file1));
-            outputStream.write(file.getBytes());
+            System.out.println("LA IMAGEN ES:");
+            System.out.println(image);
+            System.out.println("LA DATA ES:");
+            System.out.println(getContent(image));
+            outputStream.write(Base64.getDecoder().decode(getContent(image)));
         } catch (Exception e){
             throw new IOException();
         }finally {
