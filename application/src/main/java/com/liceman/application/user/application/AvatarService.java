@@ -11,6 +11,10 @@ public interface AvatarService {
     @LoggedUser
     void uploadAvatar (String image) throws IOException;
 
+    String getContent(String image);
+
+    boolean isImage(String imageData);
+
     @LoggedUser
     String getAvatar(Long id) throws FileNotFoundException;
 }

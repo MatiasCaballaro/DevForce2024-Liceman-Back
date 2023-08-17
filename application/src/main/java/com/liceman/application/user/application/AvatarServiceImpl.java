@@ -3,14 +3,11 @@ package com.liceman.application.user.application;
 import com.liceman.application.shared.application.loggeduser.LoggedUser;
 import com.liceman.application.shared.application.loggeduser.UserContext;
 import com.liceman.application.shared.exceptions.NotValidImageFormatException;
-import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import java.io.*;
-import java.nio.file.Files;
 import java.util.Base64;
 import java.util.Objects;
 
@@ -70,12 +67,14 @@ public class AvatarServiceImpl implements AvatarService{
             }
         }
     }
-    private String getContent(String image){
+    @Override
+    public String getContent(String image){
         String data;
         data = image.substring(23);
         return data;
     }
 
+    @Override
     public boolean isImage(String imageData){
         try {
             ByteArrayInputStream inputStream = new ByteArrayInputStream(
