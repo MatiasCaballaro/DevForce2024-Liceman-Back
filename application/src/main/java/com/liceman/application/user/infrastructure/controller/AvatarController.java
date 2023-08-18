@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/users/avatars")
@@ -28,9 +29,9 @@ public class AvatarController {
     )
     @PostMapping("/Avatar")
     @PreAuthorize("hasAuthority('user:read')")
-    public ResponseEntity<ResponseDTO> uploadAvatar(@RequestParam("image") MultipartFile file) {
+    public ResponseEntity<ResponseDTO> uploadAvatar(@RequestBody Map<String,String> image) {
         try {
-            avatarService.uploadAvatar(file);
+            avatarService.uploadAvatar(image.get("image"));
             return ResponseEntity.ok().body(new ResponseDTO(true, "Avatar creado", null));
         } catch (NotValidImageFormatException e) {
             return ResponseEntity.badRequest().body(
