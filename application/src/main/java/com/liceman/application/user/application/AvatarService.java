@@ -9,8 +9,8 @@ import java.io.IOException;
 public interface AvatarService {
 
     @LoggedUser
-    void uploadAvatar (MultipartFile file) throws IOException;
+    void uploadAvatar (String file) throws IOException;
 
     @LoggedUser
-    String getAvatar() throws FileNotFoundException;
+    String getAvatar(Long id) throws FileNotFoundException;
 }

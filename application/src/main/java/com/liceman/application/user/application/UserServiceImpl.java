@@ -33,6 +33,8 @@ public class UserServiceImpl implements UserService {
 
     private final TokenRepository tokenRepository;
 
+    private final AvatarService avatarService;
+
     private final MapperUtils mapperUtils;
 
     private final PasswordEncoder passwordEncoder;
@@ -99,16 +101,16 @@ public class UserServiceImpl implements UserService {
         return users;
     }
 
-    @Override
-    public Optional<UserResponseDTO> getUserById (Long id) {
-        Optional<User> user = Optional.ofNullable(userRepository.findById(id).orElseThrow(RuntimeException::new));
-        return user.map(mapperUtils::mapperToUserDTO);
-    }
-
     @LoggedUser
     @Override
     public Optional<UserResponseWithoutTrainingDTO> getLoggedUser(){
         return Optional.ofNullable(mapperUtils.mapperToUserWithoutTrainingDTO(UserContext.getUser()));
+    }
+
+    @Override
+    public Optional<UserResponseDTO> getUserById (Long id) {
+        Optional<User> user = Optional.ofNullable(userRepository.findById(id).orElseThrow(RuntimeException::new));
+        return user.map(mapperUtils::mapperToUserDTO);
     }
 
     //El método UpdateOwnUser no involucra el cambio de mail
