@@ -113,7 +113,7 @@ public class TrainingController {
     )
     @PutMapping("/{id}/admin")
     @PreAuthorize("hasAuthority('training:update')")
-    public ResponseEntity<ResponseDTO> updateTrainingbyAdmin (@PathVariable Long id, UpdateTrainingByAdminDTO updateTrainingByAdminDTO) {
+    public ResponseEntity<ResponseDTO> updateTrainingbyAdmin (@PathVariable Long id,@RequestBody UpdateTrainingByAdminDTO updateTrainingByAdminDTO) {
         try {
             return ResponseEntity.ok()
                     .body(new ResponseDTO(true,
