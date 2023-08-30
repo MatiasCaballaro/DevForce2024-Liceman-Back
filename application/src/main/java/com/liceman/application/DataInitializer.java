@@ -23,8 +23,8 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.NoSuchElementException;
 
-import static com.liceman.application.training.domain.enums.Status.PENDIENTE_USER;
-import static com.liceman.application.training.domain.enums.Status.RECHAZADA;
+import static com.liceman.application.training.domain.enums.Status.PENDING_USER;
+import static com.liceman.application.training.domain.enums.Status.REJECTED;
 import static com.liceman.application.user.domain.enums.Role.*;
 
 @Slf4j
@@ -163,7 +163,7 @@ public class DataInitializer implements CommandLineRunner {
                             "acepta la training, o puedes contactarme por Teams. Éxitos!")
                     .link("#")
                     .days(30)
-                    .status(Status.PENDIENTE_USER)
+                    .status(Status.PENDING_USER)
                     .build();
             System.out.println("Training1 Actualizado por Mentor1" + updateTrainingMentor(1L,trainingMentor1,mentor1));
 
@@ -173,7 +173,7 @@ public class DataInitializer implements CommandLineRunner {
                             "acepta el training, o puedes contactarme por Teams. Éxitos!")
                     .link("#")
                     .days(45)
-                    .status(Status.PENDIENTE_USER)
+                    .status(Status.PENDING_USER)
                     .build();
             System.out.println("Training1 Actualizado por Mentor1" + updateTrainingMentor(2L,trainingMentor2,mentor1));
 
@@ -184,7 +184,7 @@ public class DataInitializer implements CommandLineRunner {
 
             //TODO crear
             UpdateTrainingByUserDTO trainingUser1= UpdateTrainingByUserDTO.builder()
-                    .status(Status.PENDIENTE_ADMIN)
+                    .status(Status.PENDING_ADMIN)
                     .build();
             System.out.println("Training1 Actualizado por User1" + UpdateUserTrainingDTO(1L,trainingUser1));
 
@@ -216,7 +216,7 @@ public class DataInitializer implements CommandLineRunner {
         newTraining.setComments(Collections.singletonList(comment));
 
         newTraining.setCreationDate(LocalDateTime.now());
-        newTraining.setStatus(Status.PENDIENTE_MENTOR);
+        newTraining.setStatus(Status.PENDING_MENTOR);
         newTraining.setUserId(userRepository.findByEmail(userDTO.getEmail()).orElseThrow(NoSuchElementException::new));
 
         return trainingRepository.save(newTraining);
@@ -237,10 +237,10 @@ public class DataInitializer implements CommandLineRunner {
 
             training.setDays(request.getDays());
             training.setLink(request.getLink());
-            if(request.getStatus().equals(PENDIENTE_USER)){
+            if(request.getStatus().equals(PENDING_USER)){
                 training.setStatus(request.getStatus());
             } else{
-                training.setStatus(RECHAZADA);
+                training.setStatus(REJECTED);
             }
             return trainingRepository.save(training);
         } catch (Exception e) {
