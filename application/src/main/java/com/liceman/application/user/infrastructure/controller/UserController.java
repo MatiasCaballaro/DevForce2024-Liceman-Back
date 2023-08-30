@@ -21,8 +21,7 @@ public class UserController {
     private final UserService userService;
 
     @Operation(
-            description = "Devuelve la lista total de usuarios como UserResponseDTO. " +
-                    "Si se incluye un email como parámetro, busca un solo usuario"//,
+            description = "Returns a list of users as a UserResponseDTO list. "
             //summary = ""
     )
     @GetMapping
@@ -33,35 +32,35 @@ public class UserController {
                                                    @RequestParam(defaultValue = "DESC") String orderBy) {
         try{
             return ResponseEntity.ok().body(
-                    new ResponseDTO(true, "Usuarios Obtenidos", userService.findAllUsers(pageNumber, pageSize, sortBy, orderBy)));
+                    new ResponseDTO(true, "Users", userService.findAllUsers(pageNumber, pageSize, sortBy, orderBy)));
         }catch (IllegalArgumentException e){
             return ResponseEntity.badRequest().body(
                     new ResponseDTO(false, e.getMessage(), null));
         }
     }
 
-    @Operation(description = "Devuelve un usuario como UserResponseDTO")
+    @Operation(description = "Returns a single user as UserResponseDTO")
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('user:read')")
     public ResponseEntity<ResponseDTO> getUserByID(@PathVariable Long id) {
         return ResponseEntity.ok().body(
-                new ResponseDTO(true, "Usuario Obtenido", userService.getUserById(id)));
+                new ResponseDTO(true, "User", userService.getUserById(id)));
     }
 
     @GetMapping("/my-user")
     @PreAuthorize("hasAuthority('user:read')")
     public ResponseEntity<ResponseDTO> getLoggedUser() {
         return ResponseEntity.ok().body(
-                new ResponseDTO(true, "Usuario logueado", userService.getLoggedUser()));
+                new ResponseDTO(true, "Logged user", userService.getLoggedUser()));
     }
 
-    @Operation(description = "Crea un usuario a partir de un UserRequestDTO")
+    @Operation(description = "Create an user from an UserRequestDTO")
     @PostMapping
     @PreAuthorize("hasAuthority('user:create')")
     public ResponseEntity<ResponseDTO> createUser(@RequestBody UserRequestDTO request) {
         try {
             return ResponseEntity.ok().body(
-                    new ResponseDTO(true, "Usuario Creado!", userService.createUser(request)));
+                    new ResponseDTO(true, "User created!", userService.createUser(request)));
         } catch (EmailAlreadyExistsException e) {
             return ResponseEntity.badRequest().body(
                     new ResponseDTO(false, e.getMessage(), null));
@@ -74,20 +73,20 @@ public class UserController {
 
     }
 
-    @Operation(description = "Actualiza un usuario a partir de un UserRequestDTO")
+    @Operation(description = "Update an user from an UserRequestDTO")
     @PutMapping
     @PreAuthorize("hasAuthority('user:update')")
     public ResponseEntity<ResponseDTO> updateUser(@RequestBody UserRequestDTO userRequestDTO) {
         return ResponseEntity.ok().body(
-                new ResponseDTO(true, "Usuario Actualizado", userService.updateOwnUser(userRequestDTO)));
+                new ResponseDTO(true, "User updated!", userService.updateOwnUser(userRequestDTO)));
     }
 
-    @Operation(description = "Elimina un usuario a partir de un Long id")
+    @Operation(description = "Delete an user from an id (Long)")
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('user:delete')")
     public ResponseEntity<ResponseDTO> delete(@PathVariable Long id) {
         userService.deleteUserbyId(id);
         return ResponseEntity.ok()
-                .body(new ResponseDTO(true, "Usuario Eliminado", null));
+                .body(new ResponseDTO(true, "User deleted", null));
     }
 }

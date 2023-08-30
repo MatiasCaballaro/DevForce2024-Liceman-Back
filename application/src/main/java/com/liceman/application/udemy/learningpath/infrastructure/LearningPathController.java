@@ -25,12 +25,12 @@ public class LearningPathController {
         try {
             return ResponseEntity.ok().body(new ResponseDTO(
                     true,
-                    "Learning Paths obtenidos" ,
+                    "Learning Paths" ,
                     learningPathService.getLearningPaths()));
         } catch (Exception e) {
             return ResponseEntity.ok().body(new ResponseDTO(
                     false,
-                    "Error al intentar conectarse, intente nuevamente en unos instantes",
+                    "Error trying to connect, please try again in a few moments",
                     null));
         }
     }
@@ -41,12 +41,12 @@ public class LearningPathController {
         try {
             return ResponseEntity.ok().body(new ResponseDTO(
                     true,
-                    "Información del Path: " + id,
+                    "Learning path info: " + id,
                     learningPathService.getLearningPathById(id)));
         } catch (Exception e) {
             return ResponseEntity.ok().body(new ResponseDTO(
                     false,
-                    "Error al intentar conectarse, intente nuevamente en unos instantes",
+                    "Error trying to connect, please try again in a few moments",
                     null));
         }
     }

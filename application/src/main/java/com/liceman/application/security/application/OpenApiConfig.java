@@ -15,10 +15,10 @@ import io.swagger.v3.oas.annotations.servers.Server;
                 contact = @Contact(
                         name = "Matias Caballaro",
                         //email = "matias.caballaro@gmail.com",
-                        url = "https://github.com/MatiasCaballaro/devForce2024"
+                        url = "https://github.com/MatiasCaballaro/Liceman-devForce2024.git"
                 ),
-                description = "Documentation for Liceman project @devForce - 2024 practices.<br><br>"
-                + "Trainings can have these status = ",
+                description = "Documentation for Liceman project @devForce - 2024 practices.<br><br>",
+               // + "Trainings can have these status = PENDING_MENTOR, PENDING_USER, PENDING_ADMIN, APPROVED, REJECTED, FINISHED",
 
                 title = "Liceman Documentation",
                 version = "1.0",

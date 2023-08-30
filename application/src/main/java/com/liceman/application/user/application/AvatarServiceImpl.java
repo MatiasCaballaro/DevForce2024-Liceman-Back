@@ -60,7 +60,7 @@ public class AvatarServiceImpl implements AvatarService{
         }
     }
     void deleteOldAvatars () {
-        String basePath = "C:/Avatares/" + UserContext.getUser().getId();
+        String basePath = "C:/Avatars/" + UserContext.getUser().getId();
         String avatarPrefix = "avatar-";
 
         File directory = new File(basePath);
@@ -74,9 +74,9 @@ public class AvatarServiceImpl implements AvatarService{
                 if (archivo.isFile() && archivo.getName().startsWith(avatarPrefix)) {
                     // Delete the files if the files matches the prefix
                     if (archivo.delete()) {
-                        System.out.println("Archivo borrado: " + archivo.getName());
+                        System.out.println("File deleted: " + archivo.getName());
                     } else {
-                        System.out.println("No se pudo borrar el archivo: " + archivo.getName());
+                        System.out.println("File couldn't be deleted: " + archivo.getName());
                     }
                 }
             }

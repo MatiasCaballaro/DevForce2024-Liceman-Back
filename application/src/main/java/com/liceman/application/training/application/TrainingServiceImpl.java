@@ -43,7 +43,7 @@ public class TrainingServiceImpl implements TrainingService {
         newTraining.setTitle(trainingCreationRequestDTO.getTitle());
         newTraining.setUserId(UserContext.getUser());
         newTraining.setCreationDate(LocalDateTime.now());
-        newTraining.setStatus(Status.PENDIENTE_MENTOR);
+        newTraining.setStatus(Status.PENDING_MENTOR);
 
         Comment comment = Comment.builder()
                 .training_id(newTraining)
@@ -79,7 +79,7 @@ public class TrainingServiceImpl implements TrainingService {
             trainings = getAllTrainings(pageable); // Get all trainings (Admin)
         }
         if(trainings.isEmpty())
-            throw new IllegalArgumentException("no hay mas contenido para esta pagina");
+            throw new IllegalArgumentException("No content");
         else
             return trainings;
     }
@@ -116,7 +116,7 @@ public class TrainingServiceImpl implements TrainingService {
     public Training mentorUpdateTraining (Long id, UpdateTrainingByMentorDTO request) throws Exception {
         try {
             Training training = getTrainingOrException(id);
-            checkValidTrainingStatus(training.getStatus(), PENDIENTE_MENTOR);
+            checkValidTrainingStatus(training.getStatus(), PENDING_MENTOR);
             checkValidTrainingMentorArea(training.getArea());
             UpdateTrainingFromMentorRequest(training, request);
             return trainingRepository.save(training);
@@ -134,9 +134,9 @@ public class TrainingServiceImpl implements TrainingService {
     public Training userUpdateTraining (Long id, UpdateTrainingByUserDTO request) throws Exception {
         try {
             Training training = getTrainingOrException(id);
-            checkValidTrainingStatus(training.getStatus(), PENDIENTE_USER);
+            checkValidTrainingStatus(training.getStatus(),PENDING_USER);
             checkValidUser(training.getUserId().getId());
-            handledTrainingStatusUpdate(training, request.getStatus(), PENDIENTE_ADMIN);
+            handledTrainingStatusUpdate(training, request.getStatus(),PENDING_ADMIN);
             return trainingRepository.save(training);
         } catch (TrainingNotExistsException | IllegalStateException e) {
             logger.error(e.getMessage() + " - id=" + id);
@@ -152,7 +152,7 @@ public class TrainingServiceImpl implements TrainingService {
     public Training adminUpdateTraining (Long id, UpdateTrainingByAdminDTO request) throws Exception {
         try {
             Training training = getTrainingOrException(id);
-            checkValidTrainingStatus(training.getStatus(), PENDIENTE_ADMIN);
+            checkValidTrainingStatus(training.getStatus(),PENDING_ADMIN);
             UpdateTrainingFromAdminRequest(training, request);
             return trainingRepository.save(training);
         } catch (TrainingNotExistsException | IllegalStateException e) {
@@ -177,7 +177,7 @@ public class TrainingServiceImpl implements TrainingService {
 
         training.setDays(request.getDays());
         training.setLink(request.getLink());
-        handledTrainingStatusUpdate(training, request.getStatus(), PENDIENTE_USER);
+        handledTrainingStatusUpdate(training, request.getStatus(), PENDING_USER);
     }
 
 
@@ -185,7 +185,7 @@ public class TrainingServiceImpl implements TrainingService {
         training.setApprovedDate(LocalDateTime.now());
         training.setAdminId(UserContext.getUser());
         training.setEndDate(training.getApprovedDate().plusDays(training.getDays()));
-        handledTrainingStatusUpdate(training, request.getStatus(), APROBADA);
+        handledTrainingStatusUpdate(training, request.getStatus(), APPROVED);
     }
 
     private static void checkValidTrainingStatus (Status trainingStatus, Status expectedStatus) {
@@ -214,7 +214,7 @@ public class TrainingServiceImpl implements TrainingService {
         if (requestStatus.equals(expectedStatus)) {
             training.setStatus(requestStatus);
         } else {
-            training.setStatus(RECHAZADA);
+            training.setStatus(REJECTED);
         }
     }
 

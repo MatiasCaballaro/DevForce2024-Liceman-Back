@@ -5,6 +5,6 @@ import java.io.IOException;
 public class NotValidImageFormatException extends IOException {
     @Override
     public String getMessage () {
-        return "Formato de imagen incorrecto";
+        return "invalid image format";
     }
 }
