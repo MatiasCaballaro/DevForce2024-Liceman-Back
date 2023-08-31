@@ -2,6 +2,9 @@ package com.liceman.application.user.application;
 
 import com.liceman.application.shared.application.loggeduser.LoggedUser;
 import com.liceman.application.shared.application.loggeduser.UserContext;
+import com.liceman.application.udemy.course.application.CourseServiceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.liceman.application.shared.exceptions.NotValidImageFormatException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -16,7 +19,7 @@ import java.util.Objects;
 public class AvatarServiceImpl implements AvatarService{
     @Value("${avatar.baseRoute}")
     private String BaseRoute;
-
+    private static final Logger logger = LoggerFactory.getLogger(AvatarServiceImpl.class);
     @LoggedUser
     @Override
     public void uploadAvatar(String image) throws IOException {
@@ -74,9 +77,9 @@ public class AvatarServiceImpl implements AvatarService{
                 if (archivo.isFile() && archivo.getName().startsWith(avatarPrefix)) {
                     // Delete the files if the files matches the prefix
                     if (archivo.delete()) {
-                        System.out.println("Archivo borrado: " + archivo.getName());
+                        logger.info("Deleted file: {}", archivo.getName());
                     } else {
-                        System.out.println("No se pudo borrar el archivo: " + archivo.getName());
+                        logger.error("Failed to delete file: {}", archivo.getName());
                     }
                 }
             }
@@ -92,6 +95,7 @@ public class AvatarServiceImpl implements AvatarService{
             outputStream = new BufferedOutputStream(new FileOutputStream(file1));
             outputStream.write(Base64.getDecoder().decode(getContent(image)));
         } catch (Exception e){
+            logger.error("Error creating new avatar: {}", e.getMessage());
             throw new IOException();
         }finally {
             outputStream.close();
@@ -112,6 +116,7 @@ public class AvatarServiceImpl implements AvatarService{
                 inputStream = new BufferedInputStream(new FileInputStream(file));
                 byte[] dataByte = inputStream.readAllBytes();
                 inputStream.close();
+                logger.info("Obtained Avatar");
                 return Base64.getEncoder().encodeToString(dataByte);
             }
             throw new FileNotFoundException();

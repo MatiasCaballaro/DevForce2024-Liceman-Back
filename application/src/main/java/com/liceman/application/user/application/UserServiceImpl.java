@@ -9,6 +9,7 @@ import com.liceman.application.shared.application.loggeduser.LoggedUser;
 import com.liceman.application.shared.application.loggeduser.UserContext;
 import com.liceman.application.shared.application.mappers.MapperUtils;
 import com.liceman.application.shared.exceptions.EmailAlreadyExistsException;
+import com.liceman.application.udemy.course.application.CourseServiceImpl;
 import com.liceman.application.user.domain.User;
 import com.liceman.application.user.domain.enums.Role;
 import com.liceman.application.user.domain.repository.UserRepository;
@@ -16,11 +17,14 @@ import com.liceman.application.user.infrastructure.dto.UserRequestDTO;
 import com.liceman.application.user.infrastructure.dto.UserResponseDTO;
 import com.liceman.application.user.infrastructure.dto.UserResponseWithoutTrainingDTO;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -40,6 +44,8 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     private final JwtService jwtService;
+
+    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Override
     public AuthenticationResponse createUser (UserRequestDTO request) {
@@ -64,6 +70,7 @@ public class UserServiceImpl implements UserService {
         var jwtToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
         saveUserToken(savedUser, jwtToken);
+        logger.info("User created: \n{}\nAccess Token: {}\nRefresh Token: {}", savedUser, jwtToken, refreshToken);
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
@@ -78,8 +85,11 @@ public class UserServiceImpl implements UserService {
                 .expired(false)
                 .revoked(false)
                 .build();
+        logger.info("User token saved");
         tokenRepository.save(token);
+
     }
+
 
 
     @Override
@@ -96,21 +106,34 @@ public class UserServiceImpl implements UserService {
                 .stream()
                 .map(mapperUtils::mapperToUserWithoutTrainingDTO)
                 .collect(Collectors.toList());
-        if(users.isEmpty())
+        StringBuilder allUsers = new StringBuilder();
+        for (UserResponseWithoutTrainingDTO userResponse : users) {
+            allUsers.append(userResponse).append("\n");
+        }
+        logger.info("Getting all Users: \n{}", allUsers);
+
+        if(users.isEmpty()) {
+            logger.info("No more content for this page");
             throw new IllegalArgumentException("no hay mas contenido para esta pagina");
+        }
         return users;
     }
 
     @LoggedUser
     @Override
     public Optional<UserResponseWithoutTrainingDTO> getLoggedUser(){
-        return Optional.ofNullable(mapperUtils.mapperToUserWithoutTrainingDTO(UserContext.getUser()));
+        User user = UserContext.getUser();
+        Optional<UserResponseWithoutTrainingDTO> userDTO = Optional.ofNullable(mapperUtils.mapperToUserWithoutTrainingDTO(UserContext.getUser()));
+        logger.info("Getting logged user: {}", userDTO.get());
+        return userDTO;
     }
 
     @Override
     public Optional<UserResponseDTO> getUserById (Long id) {
         Optional<User> user = Optional.ofNullable(userRepository.findById(id).orElseThrow(RuntimeException::new));
-        return user.map(mapperUtils::mapperToUserDTO);
+        Optional<UserResponseDTO> userDTO = user.map(mapperUtils::mapperToUserDTO);
+        logger.info("Getting user: {}", userDTO.get());
+        return userDTO;
     }
 
     //El método UpdateOwnUser no involucra el cambio de mail
@@ -119,7 +142,9 @@ public class UserServiceImpl implements UserService {
     public UserResponseDTO updateOwnUser (UserRequestDTO userRequestDTO) {
         User loggedUser = UserContext.getUser();
         UpdateUserData(userRequestDTO, loggedUser);
-        return mapperUtils.mapperToUserDTO(userRepository.save(loggedUser));
+        Optional<UserResponseDTO> userUpdatedDTO = Optional.ofNullable(mapperUtils.mapperToUserDTO(userRepository.save(loggedUser)));
+        logger.info("Updating own user: {}", userUpdatedDTO.get());
+        return userUpdatedDTO.get();
     }
 
     private void UpdateUserData (UserRequestDTO userRequestDTO, User user) {
@@ -134,6 +159,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUserbyId (Long id) {
+        logger.info("User deleted: {}", userRepository.findById(id));
         userRepository.deleteById(id);
     }
 

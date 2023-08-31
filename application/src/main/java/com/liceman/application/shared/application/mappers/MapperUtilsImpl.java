@@ -8,12 +8,15 @@ import com.liceman.application.user.domain.User;
 import com.liceman.application.user.infrastructure.dto.UserResponseDTO;
 import com.liceman.application.user.infrastructure.dto.UserResponseWithoutTrainingDTO;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.stream.Collectors;
 
 @Service
 public class MapperUtilsImpl implements MapperUtils {
 
+    private static final Logger logger = LoggerFactory.getLogger(MapperUtilsImpl.class);
     @Override
     public UserResponseDTO mapperToUserDTO(User user) {
         UserResponseDTO userResponseDTO = new UserResponseDTO();

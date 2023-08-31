@@ -14,6 +14,7 @@ import com.liceman.application.training.infrastructure.dto.UpdateTrainingByUserD
 import com.liceman.application.user.domain.User;
 import com.liceman.application.user.domain.enums.Area;
 import com.liceman.application.user.domain.enums.Role;
+import com.liceman.application.user.infrastructure.dto.UserResponseWithoutTrainingDTO;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,7 @@ public class TrainingServiceImpl implements TrainingService {
     @LoggedUser
     @Override
     public Training createTraining(TrainingCreationRequestDTO trainingCreationRequestDTO) {
+        try{
         Training newTraining = new Training();
         newTraining.setArea(trainingCreationRequestDTO.getArea());
         newTraining.setTitle(trainingCreationRequestDTO.getTitle());
@@ -52,13 +54,17 @@ public class TrainingServiceImpl implements TrainingService {
                 .build();
 
         newTraining.getComments().add(comment);
-
+        logger.info("New training created: {}", newTraining);
         return trainingRepository.save(newTraining);
+        } catch(Exception e){
+        throw e;
+        }
     }
 
     @LoggedUser
     @Override
     public List<Training> getTrainings (Integer pageNumber, Integer pageSize, String sortBy, String orderBy) throws IllegalArgumentException {
+        try{
         Sort sort = Sort.by(sortBy);
         if ("DESC".equalsIgnoreCase(orderBy))
             sort = sort.descending();
@@ -67,6 +73,9 @@ public class TrainingServiceImpl implements TrainingService {
         else
             throw new IllegalArgumentException("Invalid orderBy value. It should be either ASC or DESC.");
         return getTrainingsAccordingToRole(UserContext.getUser(), PageRequest.of(pageNumber, pageSize, sort));
+        } catch (IllegalArgumentException e) {
+            throw e;
+        }
     }
 
     private List<Training> getTrainingsAccordingToRole (User user, Pageable pageable) {
@@ -80,34 +89,58 @@ public class TrainingServiceImpl implements TrainingService {
         }
         if(trainings.isEmpty())
             throw new IllegalArgumentException("no hay mas contenido para esta pagina");
-        else
+        else {
             return trainings;
+        }
     }
 
     private List<Training> getAllTrainingsByUser (User user, Pageable pageable) {
-        return trainingRepository.findAllByUserIdIs(user, pageable);
+        StringBuilder allTrainings = new StringBuilder();
+        List<Training> trainings = trainingRepository.findAllByUserIdIs(user, pageable);
+        for (Training training : trainings) {
+            allTrainings.append(training).append("\n");
+        }
+        logger.info("Retrieved all trainings by user Id {}: \n {}", user.getId(), allTrainings);
+        return trainings;
     }
 
     private List<Training> getAllTrainingsByArea (Area area, Pageable pageable) {
-        return trainingRepository.findAllByArea(area, pageable);
+        StringBuilder allTrainings = new StringBuilder();
+        List<Training> trainings = trainingRepository.findAllByArea(area, pageable);
+        for (Training training : trainings) {
+            allTrainings.append(training).append("\n");
+        }
+        logger.info("Retrieved all trainings by {}: \n {}", area.toString(), allTrainings);
+        return trainings;
     }
 
     private List<Training> getAllTrainings (Pageable pageable) {
-        return trainingRepository.findAll(pageable).stream().toList();
+        StringBuilder allTrainings = new StringBuilder();
+        List<Training> trainings = trainingRepository.findAll(pageable).stream().toList();
+        for (Training training : trainings) {
+            allTrainings.append(training).append("\n");
+        }
+        logger.info("Retrieved all trainings: \n{}", allTrainings);
+        return trainings;
     }
 
     @LoggedUser
     @Override
     public Training getTrainingById (Long id) throws IllegalAccessException {
-        User user = UserContext.getUser();
-        Role role = user.getRole();
-        Training training = getTrainingOrException(id);
-        if (role == Role.USER && user.getId().equals(training.getUserId().getId()) ||
+        try {
+            User user = UserContext.getUser();
+            Role role = user.getRole();
+            Training training = getTrainingOrException(id);
+            if (role == Role.USER && user.getId().equals(training.getUserId().getId()) ||
                 role == Role.MENTOR && training.getArea() == user.getArea() ||
                 role == Role.ADMIN) {
-            return training;
-        } else {
-            throw new IllegalAccessException();
+                logger.info("Retrieved training {}", training);
+                return training;
+            } else {
+                throw new IllegalAccessException();
+            }
+        }catch (IllegalAccessException e) {
+        throw e;
         }
     }
 
@@ -119,12 +152,11 @@ public class TrainingServiceImpl implements TrainingService {
             checkValidTrainingStatus(training.getStatus(), PENDIENTE_MENTOR);
             checkValidTrainingMentorArea(training.getArea());
             UpdateTrainingFromMentorRequest(training, request);
+            logger.info("Training Updated");
             return trainingRepository.save(training);
         } catch (TrainingNotExistsException | IllegalStateException e) {
-            logger.error(e.getMessage() + " - id=" + id);
             throw new IllegalStateException();
         } catch (Exception e) {
-            logger.error(e.getMessage() + " - id=" + id);
             throw new Exception(e);
         }
     }
@@ -137,12 +169,11 @@ public class TrainingServiceImpl implements TrainingService {
             checkValidTrainingStatus(training.getStatus(), PENDIENTE_USER);
             checkValidUser(training.getUserId().getId());
             handledTrainingStatusUpdate(training, request.getStatus(), PENDIENTE_ADMIN);
+            logger.info("Training Updated");
             return trainingRepository.save(training);
         } catch (TrainingNotExistsException | IllegalStateException e) {
-            logger.error(e.getMessage() + " - id=" + id);
             throw new IllegalStateException();
         } catch (Exception e) {
-            logger.error(e.getMessage() + " - id=" + id);
             throw new Exception(e);
         }
     }
@@ -154,12 +185,11 @@ public class TrainingServiceImpl implements TrainingService {
             Training training = getTrainingOrException(id);
             checkValidTrainingStatus(training.getStatus(), PENDIENTE_ADMIN);
             UpdateTrainingFromAdminRequest(training, request);
+            logger.info("Training Updated");
             return trainingRepository.save(training);
         } catch (TrainingNotExistsException | IllegalStateException e) {
-            logger.error(e.getMessage() + " - id=" + id);
             throw new IllegalStateException();
         } catch (Exception e) {
-            logger.error(e.getMessage() + " - id=" + id);
             throw new Exception(e);
         }
     }
@@ -182,6 +212,7 @@ public class TrainingServiceImpl implements TrainingService {
 
 
     private void UpdateTrainingFromAdminRequest (Training training, UpdateTrainingByAdminDTO request) {
+        logger.info("Updating training from admin request");
         training.setApprovedDate(LocalDateTime.now());
         training.setAdminId(UserContext.getUser());
         training.setEndDate(training.getApprovedDate().plusDays(training.getDays()));
@@ -207,6 +238,7 @@ public class TrainingServiceImpl implements TrainingService {
     }
 
     private Training getTrainingOrException (Long id) {
+        logger.info("Getting training by ID: {}", id);
         return trainingRepository.findById(id).orElseThrow(TrainingNotExistsException::new);
     }
 
