@@ -5,7 +5,9 @@ import com.liceman.application.shared.application.loggeduser.UserContext;
 import com.liceman.application.shared.exceptions.TrainingNotExistsException;
 import com.liceman.application.training.domain.Comment;
 import com.liceman.application.training.domain.Training;
+import com.liceman.application.training.domain.TrainingEvent;
 import com.liceman.application.training.domain.enums.Status;
+import com.liceman.application.training.domain.repository.TrainingEventRepository;
 import com.liceman.application.training.domain.repository.TrainingRepository;
 import com.liceman.application.training.infrastructure.dto.TrainingCreationRequestDTO;
 import com.liceman.application.training.infrastructure.dto.UpdateTrainingByAdminDTO;
@@ -34,6 +36,8 @@ public class TrainingServiceImpl implements TrainingService {
 
     public final TrainingRepository trainingRepository;
     public static final Logger logger = LoggerFactory.getLogger(TrainingServiceImpl.class);
+
+    private final TrainingEventRepository trainingEventRepository;  // Agrega el repositorio de eventos
 
     @LoggedUser
     @Override
@@ -119,6 +123,7 @@ public class TrainingServiceImpl implements TrainingService {
             checkValidTrainingStatus(training.getStatus(), PENDIENTE_MENTOR);
             checkValidTrainingMentorArea(training.getArea());
             UpdateTrainingFromMentorRequest(training, request);
+            saveTrainingEvent(training, request.getStatus());
             return trainingRepository.save(training);
         } catch (TrainingNotExistsException | IllegalStateException e) {
             logger.error(e.getMessage() + " - id=" + id);
@@ -131,12 +136,13 @@ public class TrainingServiceImpl implements TrainingService {
 
     @LoggedUser
     @Override
-    public Training userUpdateTraining (Long id, UpdateTrainingByUserDTO request) throws Exception {
+        public Training userUpdateTraining (Long id, UpdateTrainingByUserDTO request) throws Exception {
         try {
             Training training = getTrainingOrException(id);
             checkValidTrainingStatus(training.getStatus(), PENDIENTE_USER);
             checkValidUser(training.getUserId().getId());
             handledTrainingStatusUpdate(training, request.getStatus(), PENDIENTE_ADMIN);
+            saveTrainingEvent(training, request.getStatus());
             return trainingRepository.save(training);
         } catch (TrainingNotExistsException | IllegalStateException e) {
             logger.error(e.getMessage() + " - id=" + id);
@@ -154,6 +160,7 @@ public class TrainingServiceImpl implements TrainingService {
             Training training = getTrainingOrException(id);
             checkValidTrainingStatus(training.getStatus(), PENDIENTE_ADMIN);
             UpdateTrainingFromAdminRequest(training, request);
+            saveTrainingEvent(training, request.getStatus());
             return trainingRepository.save(training);
         } catch (TrainingNotExistsException | IllegalStateException e) {
             logger.error(e.getMessage() + " - id=" + id);
@@ -216,6 +223,18 @@ public class TrainingServiceImpl implements TrainingService {
         } else {
             training.setStatus(RECHAZADA);
         }
+    }
+
+    private void saveTrainingEvent(Training training, Status newStatus) {
+        TrainingEvent event = TrainingEvent.builder()
+                .training(training)
+                .previousStatus(training.getStatus())
+                .currentStatus(newStatus)
+                .user(UserContext.getUser())
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        trainingEventRepository.save(event);
     }
 
 
