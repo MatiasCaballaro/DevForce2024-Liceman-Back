@@ -4,6 +4,8 @@ import com.liceman.application.shared.exceptions.NotValidImageFormatException;
 import com.liceman.application.shared.infrastructure.ResponseDTO;
 import com.liceman.application.user.application.AvatarService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,9 +26,15 @@ public class AvatarController {
     private final AvatarService avatarService;
 
     @Operation(
-            description = "Sube una foto del usuario en formato image "
+            description = "Upload a photo of the user in image format"
             // summary = ""
     )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
     @PostMapping("/Avatar")
     @PreAuthorize("hasAuthority('user:read')")
     public ResponseEntity<ResponseDTO> uploadAvatar(@RequestBody Map<String,String> image) {
@@ -43,9 +51,13 @@ public class AvatarController {
     }
 
     @Operation(
-            description = "Devuelte el Avatar encodeado en base64 para el usuario logueado" + "\n\n" +
-                    "Para revisar la imagen que genera, utilizar https://codebeautify.org/base64-to-image-converter"
+            description = "Return the encoded Avatar in base64 for the logged-in use" + "\n\n" +
+                    "To review the generated image, use https://codebeautify.org/base64-to-image-converter"
     )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+    })
     @GetMapping("/Avatar/{id}")
     @PreAuthorize("hasAuthority('user:read')")
     public ResponseEntity<ResponseDTO> getAvatar(@PathVariable Long id) {

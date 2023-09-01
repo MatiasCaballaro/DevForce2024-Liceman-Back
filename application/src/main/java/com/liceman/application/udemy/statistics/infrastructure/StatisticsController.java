@@ -3,6 +3,9 @@ package com.liceman.application.udemy.statistics.infrastructure;
 import com.liceman.application.shared.infrastructure.ResponseDTO;
 import com.liceman.application.udemy.statistics.application.StatisticsService;
 import com.liceman.application.udemy.statistics.domain.ActivityResult;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,7 +23,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class StatisticsController {
 
     private final StatisticsService statisticsService;
+    @Operation(description = "Return the general statistics of a user from an email")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
 
+    })
     @GetMapping("/activity")
     @PreAuthorize("hasAuthority('training:read')") // todo check authority
     public ResponseEntity<ResponseDTO> getUserStatistics(@RequestParam String email) {
@@ -39,7 +47,11 @@ public class StatisticsController {
 
     }
 
-
+    @Operation(description = "Return the statistics of the user's courses")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+    })
     @GetMapping("/activity-courses")
     @PreAuthorize("hasAuthority('training:read')") // todo check authority
     public ResponseEntity<ResponseDTO> getUserCourseStatistics(@RequestParam String email) {
