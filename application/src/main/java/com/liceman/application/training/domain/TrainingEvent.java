@@ -30,9 +30,6 @@ public class TrainingEvent {
     private Training training;
 
     @Enumerated(EnumType.STRING)
-    private Status previousStatus;
-
-    @Enumerated(EnumType.STRING)
     private Status currentStatus;
 
     @ManyToOne(fetch = FetchType.EAGER)
