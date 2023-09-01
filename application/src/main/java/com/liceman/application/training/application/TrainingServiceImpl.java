@@ -228,7 +228,6 @@ public class TrainingServiceImpl implements TrainingService {
     private void saveTrainingEvent(Training training, Status newStatus) {
         TrainingEvent event = TrainingEvent.builder()
                 .training(training)
-                .previousStatus(training.getStatus())
                 .currentStatus(newStatus)
                 .user(UserContext.getUser())
                 .timestamp(LocalDateTime.now())
