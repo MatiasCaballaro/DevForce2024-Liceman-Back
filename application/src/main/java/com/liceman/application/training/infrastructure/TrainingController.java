@@ -9,6 +9,8 @@ import com.liceman.application.training.infrastructure.dto.UpdateTrainingByAdmin
 import com.liceman.application.training.infrastructure.dto.UpdateTrainingByMentorDTO;
 import com.liceman.application.training.infrastructure.dto.UpdateTrainingByUserDTO;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,7 +29,11 @@ public class TrainingController {
     private final TrainingService trainingService;
     private final MapperUtils mapperUtils;
 
-
+    @Operation(description = "Create a training from TrainingCreationRequestDTO")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+    })
     @PostMapping
     @PreAuthorize("hasAnyAuthority('training:create')")
     public ResponseEntity<ResponseDTO> createTraining (@RequestBody TrainingCreationRequestDTO request) {
@@ -36,7 +42,12 @@ public class TrainingController {
                         "Training creada!",
                         mapperUtils.mapperToTrainingUserResponseDTO(trainingService.createTraining(request))));
     }
-
+    @Operation(description = "Return a list of trainings sorted in descending order")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+    })
     @GetMapping
     @PreAuthorize("hasAuthority('training:read')")
     public ResponseEntity<ResponseDTO> getTrainings (@RequestParam(defaultValue = "0") Integer pageNumber,
@@ -51,7 +62,12 @@ public class TrainingController {
             return ResponseEntity.badRequest().body(new ResponseDTO(false, e.getMessage(), null));
         }
     }
-
+    @Operation(description = "Return training by Long id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('training:read')")
     public ResponseEntity<ResponseDTO> getTrainingByID (@PathVariable Long id) {
@@ -69,8 +85,13 @@ public class TrainingController {
     }
 
     @Operation(
-            description = "Enums de status que debería volver la operación del mentor : PENDIENTE_USER || RECHAZADA"
+            description = "Enums of statuses that the mentor operation should return: PENDING_USER || REJECTED"
     )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
     @PutMapping("/{id}/mentor")
     @PreAuthorize("hasAuthority('training:update')")
     public ResponseEntity<ResponseDTO> updateTrainingbyMentor (@PathVariable Long id, @RequestBody UpdateTrainingByMentorDTO updateTrainingByMentorDTO) {
@@ -89,8 +110,13 @@ public class TrainingController {
     }
 
     @Operation(
-            description = "Enums de status que debería volver la operación del mentor : PENDIENTE_ADMIN || RECHAZADA"
+            description = "Enums of statuses that the mentor operation should return: PENDING_ADMIN || REJECTED"
     )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
     @PutMapping("/{id}/user")
     @PreAuthorize("hasAuthority('training:update')")
     public ResponseEntity<ResponseDTO> updateTrainingbyUser (@PathVariable Long id, @RequestBody UpdateTrainingByUserDTO updateTrainingByUserDTO) {
@@ -109,9 +135,14 @@ public class TrainingController {
 
 
     @Operation(
-            description = "Enums de status que debería volver la operación del mentor : APROBADA || RECHAZADA"
+            description = "Enums of statuses that the mentor operation should return: APPROVED || REJECTED"
     )
     @PutMapping("/{id}/admin")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
     @PreAuthorize("hasAuthority('training:update')")
     public ResponseEntity<ResponseDTO> updateTrainingbyAdmin (@PathVariable Long id,@RequestBody UpdateTrainingByAdminDTO updateTrainingByAdminDTO) {
         try {

@@ -5,6 +5,8 @@ import com.liceman.application.shared.infrastructure.ResponseDTO;
 import com.liceman.application.user.application.UserService;
 import com.liceman.application.user.infrastructure.dto.UserRequestDTO;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,10 +23,15 @@ public class UserController {
     private final UserService userService;
 
     @Operation(
-            description = "Devuelve la lista total de usuarios como UserResponseDTO. " +
-                    "Si se incluye un email como parámetro, busca un solo usuario"//,
+            description = "Returns the total list of users as UserResponseDTO. " +
+                    "if an email is included as a parameter, search for a single user"//,
             //summary = ""
     )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
+    })
     @GetMapping
     @PreAuthorize("hasAuthority('user:read')")
     public ResponseEntity<ResponseDTO> getAllUsers(@RequestParam(defaultValue = "0") Integer pageNumber,
@@ -40,14 +47,23 @@ public class UserController {
         }
     }
 
-    @Operation(description = "Devuelve un usuario como UserResponseDTO")
+    @Operation(description = "Return a user from Long id as a UserResponseDTO")
     @GetMapping("/{id}")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
+    })
     @PreAuthorize("hasAuthority('user:read')")
     public ResponseEntity<ResponseDTO> getUserByID(@PathVariable Long id) {
         return ResponseEntity.ok().body(
                 new ResponseDTO(true, "Usuario Obtenido", userService.getUserById(id)));
     }
 
+    @Operation(description = "Return a logged user as a UserResponseDTO")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
+    })
     @GetMapping("/my-user")
     @PreAuthorize("hasAuthority('user:read')")
     public ResponseEntity<ResponseDTO> getLoggedUser() {
@@ -55,7 +71,13 @@ public class UserController {
                 new ResponseDTO(true, "Usuario logueado", userService.getLoggedUser()));
     }
 
-    @Operation(description = "Crea un usuario a partir de un UserRequestDTO")
+    @Operation(description = "Create a user from UserRequestDTO")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
     @PostMapping
     @PreAuthorize("hasAuthority('user:create')")
     public ResponseEntity<ResponseDTO> createUser(@RequestBody UserRequestDTO request) {
@@ -74,7 +96,11 @@ public class UserController {
 
     }
 
-    @Operation(description = "Actualiza un usuario a partir de un UserRequestDTO")
+    @Operation(description = "Update a user from UserRequestDTO")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+    })
     @PutMapping
     @PreAuthorize("hasAuthority('user:update')")
     public ResponseEntity<ResponseDTO> updateUser(@RequestBody UserRequestDTO userRequestDTO) {
@@ -82,8 +108,12 @@ public class UserController {
                 new ResponseDTO(true, "Usuario Actualizado", userService.updateOwnUser(userRequestDTO)));
     }
 
-    @Operation(description = "Elimina un usuario a partir de un Long id")
+    @Operation(description = "Delete a user from Long id")
     @DeleteMapping("/{id}")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+    })
     @PreAuthorize("hasAuthority('user:delete')")
     public ResponseEntity<ResponseDTO> delete(@PathVariable Long id) {
         userService.deleteUserbyId(id);
