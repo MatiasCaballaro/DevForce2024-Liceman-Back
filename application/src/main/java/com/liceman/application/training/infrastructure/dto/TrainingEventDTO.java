@@ -1,17 +1,23 @@
 package com.liceman.application.training.infrastructure.dto;
 
-import com.liceman.application.training.domain.Training;
 import com.liceman.application.training.domain.enums.Status;
-import com.liceman.application.user.domain.User;
-import jakarta.persistence.*;
+import com.liceman.application.training.domain.enums.TrainingEventRegistration;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class TrainingEventDTO {
-
-    private Long id;
-    private Training training;
+    private Long trainingEventId;
+    private Long trainingId;
+    private Long userId;
+    private String userName;
     private Status currentStatus;
-    private User user;
+    private TrainingEventRegistration event;
     private LocalDateTime timestamp;
 }

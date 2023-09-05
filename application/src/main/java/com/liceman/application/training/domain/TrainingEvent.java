@@ -1,6 +1,7 @@
 package com.liceman.application.training.domain;
 
 import com.liceman.application.training.domain.enums.Status;
+import com.liceman.application.training.domain.enums.TrainingEventRegistration;
 import com.liceman.application.user.domain.User;
 import com.liceman.application.user.domain.enums.Area;
 import jakarta.persistence.*;
@@ -31,6 +32,9 @@ public class TrainingEvent {
 
     @Enumerated(EnumType.STRING)
     private Status currentStatus;
+
+    @Enumerated(EnumType.STRING)
+    private TrainingEventRegistration event;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
