@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/trainings")
-//@Tag(name = "TrainingEveb")
+//@Tag(name = "TrainingEvent")
 @RequiredArgsConstructor
 public class TrainingEventController {
 

@@ -82,7 +82,16 @@ public class MapperUtilsImpl implements MapperUtils {
 
     @Override
     public TrainingEventDTO mapperToTrainingEventDTO(TrainingEvent trainingEvent) {
-        return null;
+        TrainingEventDTO trainingEventDTO = TrainingEventDTO.builder()
+                .trainingEventId(trainingEvent.getId())
+                .trainingId(trainingEvent.getTraining().getId())
+                .userId(trainingEvent.getUser().getId())
+                .userName(trainingEvent.getUser().getFirstname() + " " + trainingEvent.getUser().getLastname())
+                .currentStatus(trainingEvent.getCurrentStatus())
+                .event(trainingEvent.getEvent())
+                .timestamp(trainingEvent.getTimestamp())
+                .build();
+        return trainingEventDTO;
     }
 
 
