@@ -6,6 +6,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.liceman.mock.shared.application.CreatorFromJsonService;
 import com.liceman.mock.udemy.domain.*;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +29,9 @@ public class udemyMockController {
     @Operation(
             description = "test Mock Activity"
     )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+    })
     @GetMapping("/activity")
     public ResponseEntity<Activity> mockActivity() {
         ActivityResult activityResult = ActivityResult.builder()
@@ -57,6 +62,9 @@ public class udemyMockController {
     @Operation(
             description = "test Mock Activity Courses"
     )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+    })
     @GetMapping("/activity-course")
     public ResponseEntity<ActivityCourse> mockActivityCourse() {
         ActivityCourseResult activityCourseResult1 = ActivityCourseResult.builder()
@@ -143,6 +151,9 @@ public class udemyMockController {
     @Operation(
             description = "test Mock Activity Courses"
     )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+    })
     @GetMapping("/courses")
     public ResponseEntity<Courses> mockCourses() {
         Course course = Course.builder()
@@ -234,6 +245,9 @@ public class udemyMockController {
     @Operation(
             description = "test Mock Activity Course by id"
     )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+    })
     @GetMapping("/courses/{id}")
     public ResponseEntity<Course> mockCourseById(@PathVariable int id) {
         Course course = Course.builder()
@@ -321,6 +335,9 @@ public class udemyMockController {
     @Operation(
             description = "test Mock Learning Paths"
     )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+    })
     @GetMapping("/learning-paths")
     public ResponseEntity<LearningPath> mockLearningPaths() {
             String json = "{\n" +
@@ -531,6 +548,9 @@ public class udemyMockController {
     @Operation(
             description = "test Mock Learning Path by id"
     )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+    })
     @GetMapping("/learning-paths/{id}")
     public ResponseEntity<LearningPathResult> mockLearningPathById(@PathVariable int id) {
         String json = "{\n" +
