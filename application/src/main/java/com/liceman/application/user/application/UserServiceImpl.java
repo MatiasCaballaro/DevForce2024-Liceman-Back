@@ -18,6 +18,7 @@ import com.liceman.application.user.infrastructure.dto.UserResponseWithoutTraini
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +41,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     private final JwtService jwtService;
+
 
     @Override
     public AuthenticationResponse createUser (UserRequestDTO request) {
@@ -122,7 +124,7 @@ public class UserServiceImpl implements UserService {
         return mapperUtils.mapperToUserDTO(userRepository.save(loggedUser));
     }
 
-    private void UpdateUserData (UserRequestDTO userRequestDTO, User user) {
+    public void UpdateUserData (UserRequestDTO userRequestDTO, User user) {
         user.setFirstname(userRequestDTO.getFirstname());
         user.setLastname(userRequestDTO.getLastname());
         if (userRequestDTO.getPassword() != null && !(userRequestDTO.getPassword().isEmpty())) {
@@ -131,6 +133,7 @@ public class UserServiceImpl implements UserService {
         user.setPhone(userRequestDTO.getPhone());
         user.setHasTeams(userRequestDTO.getHasTeams());
     }
+
 
     @Override
     public void deleteUserbyId (Long id) {
