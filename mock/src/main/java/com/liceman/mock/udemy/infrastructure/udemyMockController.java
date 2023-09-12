@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -34,6 +35,7 @@ public class udemyMockController {
     })
     @GetMapping("/activity")
     public ResponseEntity<Activity> mockActivity() {
+
         ActivityResult activityResult = ActivityResult.builder()
                 .user_name("Test")
                 .user_surname("Mock")
@@ -340,7 +342,7 @@ public class udemyMockController {
     })
     @GetMapping("/learning-paths")
     public ResponseEntity<LearningPath> mockLearningPaths() {
-            String json = "{\n" +
+        String json = "{\n" +
                     "    \"_class\": \"learning_path\",\n" +
                     "    \"id\": 2903050,\n" +
                     "    \"url\": \"https://gire.udemy.com/learning-paths/2903050\",\n" +

@@ -1,5 +1,6 @@
 package com.liceman.application.udemy.learningpath.application;
 
+import com.liceman.application.udemy.course.application.CourseServiceImpl;
 import com.liceman.application.udemy.learningpath.domain.LearningPath;
 import com.liceman.application.udemy.learningpath.domain.LearningPathResult;
 import lombok.RequiredArgsConstructor;
@@ -13,14 +14,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 public class LearningPathServiceImpl implements LearningPathService {
-
+    private static final Logger logger = LoggerFactory.getLogger(LearningPathServiceImpl.class);
     @Value("${mock.udemy}")
     boolean mockActivated;
 
@@ -44,13 +46,16 @@ public class LearningPathServiceImpl implements LearningPathService {
     @Override
     public LearningPath getLearningPaths() throws IOException {
         if (!mockActivated) {
+            logger.info("Fetching Udemy learning paths");
             return callUdemyLearningPath();
         }
+        logger.info("Fetching mock learning paths");
         return callMockLearningPath();
     }
 
     private LearningPath callMockLearningPath() {
         String mockedActivityLearningPathUrl = mockedEndpoint + "/udemy/learning-paths";
+        logger.info("Calling mock learning paths URL: {}", mockedActivityLearningPathUrl);
         ResponseEntity<LearningPath> response = restTemplate.exchange(
                 mockedActivityLearningPathUrl,
                 HttpMethod.GET,
@@ -66,6 +71,7 @@ public class LearningPathServiceImpl implements LearningPathService {
         byte[] credentialsBytes = credentials.getBytes();
         byte[] base64CredentialsBytes = Base64.encodeBase64(credentialsBytes);
         String base64Credentials = new String(base64CredentialsBytes);
+
         headers.add("Authorization", "Basic " + base64Credentials);
         return headers;
     }
@@ -80,6 +86,7 @@ public class LearningPathServiceImpl implements LearningPathService {
             );
             return Objects.requireNonNull(response.getBody());
         } catch (Exception e) {
+            logger.error("Error while fetching learning paths: {}", e.getMessage());
             throw new IOException(e.getMessage());
         }
     }
@@ -97,13 +104,16 @@ public class LearningPathServiceImpl implements LearningPathService {
     @Override
     public LearningPathResult getLearningPathById(int id) throws IOException {
         if (!mockActivated) {
+            logger.info("Fetching Udemy learning paths");
             return callUdemyLearningPathByID(id);
         }
+        logger.info("Fetching mock learning paths");
         return callMockLearningPathByID(id);
     }
 
     private LearningPathResult callMockLearningPathByID(int id) {
         String mockedActivityLearningPathUrl = mockedEndpoint + "/udemy/learning-paths/"+id;
+        logger.info("Calling mock learning path URL with ID: {}", mockedActivityLearningPathUrl);
         ResponseEntity<LearningPathResult> response = restTemplate.exchange(
                 mockedActivityLearningPathUrl,
                 HttpMethod.GET,
@@ -115,6 +125,7 @@ public class LearningPathServiceImpl implements LearningPathService {
 
     private LearningPathResult callUdemyLearningPathByID(int id) throws IOException {
         try {
+
             ResponseEntity<LearningPathResult> response = restTemplate.exchange(
                     getLearningPathURLWithId(id),
                     HttpMethod.GET,
@@ -123,6 +134,7 @@ public class LearningPathServiceImpl implements LearningPathService {
             );
             return Objects.requireNonNull(response.getBody());
         } catch (Exception e) {
+            logger.error("Error while fetching learning path with ID {}: {}", id, e.getMessage());
             throw new IOException(e.getMessage());
         }
     }

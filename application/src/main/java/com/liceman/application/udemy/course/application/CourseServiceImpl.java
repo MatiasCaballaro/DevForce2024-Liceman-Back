@@ -13,14 +13,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 public class CourseServiceImpl implements CourseService {
-
+    private static final Logger logger = LoggerFactory.getLogger(CourseServiceImpl.class);
     @Value("${mock.udemy}")
     boolean mockActivated;
 
@@ -44,8 +45,10 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public Courses getCourses() throws IOException {
         if (!mockActivated) {
+            logger.info("Fetching Udemy courses");
             return callUdemyCourses();
         }
+        logger.info("Fetching mock courses");
         return callMockCourses();
     }
 
@@ -80,6 +83,7 @@ public class CourseServiceImpl implements CourseService {
             );
             return Objects.requireNonNull(response.getBody());
         } catch (Exception e) {
+            logger.error("Error while fetching Udemy courses: {}", e.getMessage());
             throw new IOException(e.getMessage());
         }
     }
@@ -99,19 +103,23 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public Course getCourseById(int id) throws IOException {
         if (!mockActivated) {
+            logger.info("Fetching Udemy course by ID: {}", id);
             return callUdemyCourseById(id);
         }
+        logger.info("Fetching mock course by ID: {}", id);
         return callMockCourseById(id);
     }
 
     private Course callMockCourseById(int id) {
         String mockedActivityCourseUrl = mockedEndpoint + "/udemy/courses/" + id;
+        logger.info("Calling mock courses URL: {}", mockedActivityCourseUrl);
         ResponseEntity<Course> response = restTemplate.exchange(
                 mockedActivityCourseUrl,
                 HttpMethod.GET,
                 null,
                 Course.class
         );
+        logger.info("Mock courses response received");
         return Objects.requireNonNull(response.getBody());
     }
 
@@ -123,8 +131,11 @@ public class CourseServiceImpl implements CourseService {
                 new HttpEntity<>(addUdemyAuthHeaders()),
                 Course.class
             );
+            logger.info("Calling Udemy courses URL: {}", getCoursesURL());
+            logger.info("Udemy courses response received");
             return Objects.requireNonNull(response.getBody());
         } catch (Exception e) {
+            logger.error("Error while fetching Udemy courses: {}", e.getMessage());
             throw new IOException(e.getMessage());
         }
     }

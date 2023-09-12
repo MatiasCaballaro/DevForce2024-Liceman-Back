@@ -7,6 +7,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class CourseController {
 
     private final CourseService courseService;
+    private static final Logger logger = LoggerFactory.getLogger(CourseController.class);
+
     @Operation(description = "Return a list of courses")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
@@ -35,12 +39,14 @@ public class CourseController {
                     "Course list",
                     courseService.getCourses()));
         } catch (Exception e) {
+            logger.error("Error while fetching courses: {} {}", e.getClass(), e.getMessage());
             return ResponseEntity.ok().body(new ResponseDTO(
                     false,
                     "Error trying to connect, please try again in a few moments",
                     null));
         }
     }
+
     @Operation(description = "Return courses by a long id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
@@ -55,6 +61,7 @@ public class CourseController {
                     "Course info: " + id,
                     courseService.getCourseById(id)));
         } catch (Exception e) {
+            logger.error("Error while fetching course with ID {}: {} {}", id, e.getClass(), e.getMessage());
             return ResponseEntity.ok().body(new ResponseDTO(
                     false,
                     "Error trying to connect, please try again in a few moments",

@@ -9,6 +9,7 @@ import com.liceman.application.shared.application.loggeduser.LoggedUser;
 import com.liceman.application.shared.application.loggeduser.UserContext;
 import com.liceman.application.shared.application.mappers.MapperUtils;
 import com.liceman.application.shared.exceptions.EmailAlreadyExistsException;
+import com.liceman.application.udemy.course.application.CourseServiceImpl;
 import com.liceman.application.user.domain.User;
 import com.liceman.application.user.domain.enums.Role;
 import com.liceman.application.user.domain.repository.UserRepository;
@@ -16,11 +17,14 @@ import com.liceman.application.user.infrastructure.dto.UserRequestDTO;
 import com.liceman.application.user.infrastructure.dto.UserResponseDTO;
 import com.liceman.application.user.infrastructure.dto.UserResponseWithoutTrainingDTO;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -40,6 +44,8 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     private final JwtService jwtService;
+
+    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Override
     public AuthenticationResponse createUser (UserRequestDTO request) {
@@ -79,6 +85,7 @@ public class UserServiceImpl implements UserService {
                 .revoked(false)
                 .build();
         tokenRepository.save(token);
+        logger.info("User token saved");
     }
 
 
@@ -134,6 +141,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUserbyId (Long id) {
+        logger.info("User deleted: {}", userRepository.findById(id));
         userRepository.deleteById(id);
     }
 

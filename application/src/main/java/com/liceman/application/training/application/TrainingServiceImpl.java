@@ -17,6 +17,7 @@ import com.liceman.application.training.infrastructure.dto.UpdateTrainingByUserD
 import com.liceman.application.user.domain.User;
 import com.liceman.application.user.domain.enums.Area;
 import com.liceman.application.user.domain.enums.Role;
+import com.liceman.application.user.infrastructure.dto.UserResponseWithoutTrainingDTO;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +44,7 @@ public class TrainingServiceImpl implements TrainingService {
     @LoggedUser
     @Override
     public Training createTraining(TrainingCreationRequestDTO trainingCreationRequestDTO) {
+        try{
         Training newTraining = new Training();
         newTraining.setArea(trainingCreationRequestDTO.getArea());
         newTraining.setTitle(trainingCreationRequestDTO.getTitle());
@@ -57,10 +59,14 @@ public class TrainingServiceImpl implements TrainingService {
                 .build();
 
         newTraining.getComments().add(comment);
+            newTraining = trainingRepository.save(newTraining);
+            saveTrainingEvent(newTraining, newTraining.getStatus(), TrainingEventRegistration.CREATED);
+            logger.info("New training created: {}", newTraining);
+            return newTraining;
+        } catch(Exception e){
+            throw e;
+        }
 
-        newTraining = trainingRepository.save(newTraining);
-        saveTrainingEvent(newTraining, newTraining.getStatus(), TrainingEventRegistration.CREATED);
-        return newTraining;
     }
 
     @LoggedUser
@@ -87,8 +93,9 @@ public class TrainingServiceImpl implements TrainingService {
         }
         if(trainings.isEmpty())
             throw new IllegalArgumentException("No content");
-        else
+        else {
             return trainings;
+        }
     }
 
     private List<Training> getAllTrainingsByUser (User user, Pageable pageable) {
@@ -127,7 +134,9 @@ public class TrainingServiceImpl implements TrainingService {
             checkValidTrainingMentorArea(training.getArea());
             UpdateTrainingFromMentorRequest(training, request);
             saveTrainingEvent(training, request.getStatus(), TrainingEventRegistration.MENTOR_UPDATE);
-            return trainingRepository.save(training);
+            training = trainingRepository.save(training);
+            logger.info("Training Updated");
+            return training;
         } catch (TrainingNotExistsException | IllegalStateException e) {
             logger.error(e.getMessage() + " - id=" + id);
             throw new IllegalStateException();
@@ -146,7 +155,9 @@ public class TrainingServiceImpl implements TrainingService {
             checkValidUser(training.getUserId().getId());
             handledTrainingStatusUpdate(training, request.getStatus(),PENDING_ADMIN);
             saveTrainingEvent(training, request.getStatus(), TrainingEventRegistration.USER_UPDATE);
-            return trainingRepository.save(training);
+            training = trainingRepository.save(training);
+            logger.info("Training Updated");
+            return training;
         } catch (TrainingNotExistsException | IllegalStateException e) {
             logger.error(e.getMessage() + " - id=" + id);
             throw new IllegalStateException();
@@ -164,7 +175,9 @@ public class TrainingServiceImpl implements TrainingService {
             checkValidTrainingStatus(training.getStatus(),PENDING_ADMIN);
             UpdateTrainingFromAdminRequest(training, request);
             saveTrainingEvent(training, request.getStatus(), TrainingEventRegistration.ADMIN_UPDATE);
-            return trainingRepository.save(training);
+            training = trainingRepository.save(training);
+            logger.info("Training Updated");
+            return training;
         } catch (TrainingNotExistsException | IllegalStateException e) {
             logger.error(e.getMessage() + " - id=" + id);
             throw new IllegalStateException();
@@ -192,6 +205,7 @@ public class TrainingServiceImpl implements TrainingService {
 
 
     private void UpdateTrainingFromAdminRequest (Training training, UpdateTrainingByAdminDTO request) {
+        logger.info("Updating training from admin request");
         training.setApprovedDate(LocalDateTime.now());
         training.setAdminId(UserContext.getUser());
         training.setEndDate(training.getApprovedDate().plusDays(training.getDays()));
@@ -217,6 +231,7 @@ public class TrainingServiceImpl implements TrainingService {
     }
 
     private Training getTrainingOrException (Long id) {
+        logger.info("Getting training by ID: {}", id);
         return trainingRepository.findById(id).orElseThrow(TrainingNotExistsException::new);
     }
 
