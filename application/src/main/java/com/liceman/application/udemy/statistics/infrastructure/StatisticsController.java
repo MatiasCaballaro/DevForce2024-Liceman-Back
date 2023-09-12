@@ -37,11 +37,11 @@ public class StatisticsController {
             if (activityResult == null) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
             }
-            return ResponseEntity.ok().body(new ResponseDTO(true, "Estadísticas Generales del Usuario", activityResult));
+            return ResponseEntity.ok().body(new ResponseDTO(true, "User general statistics", activityResult));
         } catch (Exception e) {
             return ResponseEntity.ok().body(new ResponseDTO(
                     false,
-                    "Error al intentar conectarse, intente nuevamente en unos instantes",
+                    "Error trying to connect, please try again in a few moments",
                     null));
         }
 
@@ -58,12 +58,12 @@ public class StatisticsController {
         try {
             return ResponseEntity.ok().body(new ResponseDTO(
                     true,
-                    "Estadísticas de los Cursos del Usuario",
+                    "User's course statistics",
                     statisticsService.getCoursesActivity(email)));
         } catch (Exception e) {
             return ResponseEntity.ok().body(new ResponseDTO(
                     false,
-                    "Error al intentar conectarse, intente nuevamente en unos instantes",
+                    "Error trying to connect, please try again in a few moments",
                     null));
         }
 

@@ -32,12 +32,12 @@ public class CourseController {
         try {
             return ResponseEntity.ok().body(new ResponseDTO(
                     true,
-                    "Listado de Cursos:",
+                    "Course list",
                     courseService.getCourses()));
         } catch (Exception e) {
             return ResponseEntity.ok().body(new ResponseDTO(
                     false,
-                    "Error al intentar conectarse, intente nuevamente en unos instantes",
+                    "Error trying to connect, please try again in a few moments",
                     null));
         }
     }
@@ -52,12 +52,12 @@ public class CourseController {
         try {
             return ResponseEntity.ok().body(new ResponseDTO(
                     true,
-                    "Información del curso: " + id,
+                    "Course info: " + id,
                     courseService.getCourseById(id)));
         } catch (Exception e) {
             return ResponseEntity.ok().body(new ResponseDTO(
                     false,
-                    "Error al intentar conectarse, intente nuevamente en unos instantes",
+                    "Error trying to connect, please try again in a few moments",
                     null));
         }
     }

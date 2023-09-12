@@ -40,7 +40,7 @@ public class UserController {
                                                    @RequestParam(defaultValue = "DESC") String orderBy) {
         try{
             return ResponseEntity.ok().body(
-                    new ResponseDTO(true, "Usuarios Obtenidos", userService.findAllUsers(pageNumber, pageSize, sortBy, orderBy)));
+                    new ResponseDTO(true, "Users", userService.findAllUsers(pageNumber, pageSize, sortBy, orderBy)));
         }catch (IllegalArgumentException e){
             return ResponseEntity.badRequest().body(
                     new ResponseDTO(false, e.getMessage(), null));
@@ -56,7 +56,7 @@ public class UserController {
     @PreAuthorize("hasAuthority('user:read')")
     public ResponseEntity<ResponseDTO> getUserByID(@PathVariable Long id) {
         return ResponseEntity.ok().body(
-                new ResponseDTO(true, "Usuario Obtenido", userService.getUserById(id)));
+                new ResponseDTO(true, "User", userService.getUserById(id)));
     }
 
     @Operation(description = "Return a logged user as a UserResponseDTO")
@@ -68,7 +68,7 @@ public class UserController {
     @PreAuthorize("hasAuthority('user:read')")
     public ResponseEntity<ResponseDTO> getLoggedUser() {
         return ResponseEntity.ok().body(
-                new ResponseDTO(true, "Usuario logueado", userService.getLoggedUser()));
+                new ResponseDTO(true, "Logged user", userService.getLoggedUser()));
     }
 
     @Operation(description = "Create a user from UserRequestDTO")
@@ -83,7 +83,7 @@ public class UserController {
     public ResponseEntity<ResponseDTO> createUser(@RequestBody UserRequestDTO request) {
         try {
             return ResponseEntity.ok().body(
-                    new ResponseDTO(true, "Usuario Creado!", userService.createUser(request)));
+                    new ResponseDTO(true, "User created!", userService.createUser(request)));
         } catch (EmailAlreadyExistsException e) {
             return ResponseEntity.badRequest().body(
                     new ResponseDTO(false, e.getMessage(), null));
@@ -105,7 +105,7 @@ public class UserController {
     @PreAuthorize("hasAuthority('user:update')")
     public ResponseEntity<ResponseDTO> updateUser(@RequestBody UserRequestDTO userRequestDTO) {
         return ResponseEntity.ok().body(
-                new ResponseDTO(true, "Usuario Actualizado", userService.updateOwnUser(userRequestDTO)));
+                new ResponseDTO(true, "User updated!", userService.updateOwnUser(userRequestDTO)));
     }
 
     @Operation(description = "Delete a user from Long id")
@@ -118,6 +118,6 @@ public class UserController {
     public ResponseEntity<ResponseDTO> delete(@PathVariable Long id) {
         userService.deleteUserbyId(id);
         return ResponseEntity.ok()
-                .body(new ResponseDTO(true, "Usuario Eliminado", null));
+                .body(new ResponseDTO(true, "User deleted", null));
     }
 }

@@ -39,7 +39,7 @@ public class TrainingController {
     public ResponseEntity<ResponseDTO> createTraining (@RequestBody TrainingCreationRequestDTO request) {
         return ResponseEntity.ok().body(
                 new ResponseDTO(true,
-                        "Training creada!",
+                        "Training created!",
                         mapperUtils.mapperToTrainingUserResponseDTO(trainingService.createTraining(request))));
     }
     @Operation(description = "Return a list of trainings sorted in descending order")
@@ -55,7 +55,7 @@ public class TrainingController {
                                                      @RequestParam(defaultValue = "id") String sortBy,
                                                      @RequestParam(defaultValue = "DESC") String orderBy) {
         try {
-            return ResponseEntity.ok().body(new ResponseDTO(true, "Trainings Obtenidas", trainingService.getTrainings(pageNumber, pageSize, sortBy, orderBy)
+            return ResponseEntity.ok().body(new ResponseDTO(true, "Trainings", trainingService.getTrainings(pageNumber, pageSize, sortBy, orderBy)
                     .stream()
                     .map(mapperUtils::mapperToTrainingUserResponseDTO).collect(Collectors.toList())));
         } catch (Exception e) {
@@ -73,7 +73,7 @@ public class TrainingController {
     public ResponseEntity<ResponseDTO> getTrainingByID (@PathVariable Long id) {
         try {
             return ResponseEntity.ok().body(
-                    new ResponseDTO(true, "Trainings Obtenidas", mapperUtils.mapperToTrainingUserResponseDTO(trainingService.getTrainingById(id))));
+                    new ResponseDTO(true, "Trainings", mapperUtils.mapperToTrainingUserResponseDTO(trainingService.getTrainingById(id))));
         } catch (TrainingNotExistsException | IllegalAccessException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
                     new ResponseDTO(false, null, null));
@@ -98,7 +98,7 @@ public class TrainingController {
         try {
             return ResponseEntity.ok()
                     .body(new ResponseDTO(true,
-                            "Training Actualizada!",
+                            "Training updated!",
                             mapperUtils.mapperToTrainingUserResponseDTO(trainingService.mentorUpdateTraining(id, updateTrainingByMentorDTO))));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
@@ -148,7 +148,7 @@ public class TrainingController {
         try {
             return ResponseEntity.ok()
                     .body(new ResponseDTO(true,
-                            "Training Actualizada!",
+                            "Training updated!",
                             mapperUtils.mapperToTrainingUserResponseDTO(trainingService.adminUpdateTraining(id, updateTrainingByAdminDTO))));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);

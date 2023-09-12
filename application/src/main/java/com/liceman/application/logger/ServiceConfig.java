@@ -9,13 +9,13 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class ServiceConfig {
 
-    // Siempre que vaya a usar el restTemplate tengo que inyectarle este bean si quiero la respuesta del LoggingRequestResponseInterceptor
+    // Always need this inyection when restTemplate has to be used
     @Bean
     public RestTemplate restTemplate() {
-        // Utiliza BufferingClientHttpRequestFactory para permitir la lectura múltiple del cuerpo de solicitud
+        // Uses BufferingClientHttpRequestFactory to let multiple reading of the request body
         RestTemplate restTemplate = new RestTemplate(new BufferingClientHttpRequestFactory(new HttpComponentsClientHttpRequestFactory()));
 
-        // Agregar el interceptor para logging de solicitudes y respuestas
+        // Add the interceptor to log requests and responses
         restTemplate.getInterceptors().add(new LoggingRequestResponseInterceptor());
 
         return restTemplate;
