@@ -2,8 +2,10 @@ package com.liceman.application.shared.application.mappers;
 
 import com.liceman.application.training.domain.Comment;
 import com.liceman.application.training.domain.Training;
+import com.liceman.application.training.domain.TrainingEvent;
 import com.liceman.application.training.infrastructure.dto.CommentDTO;
 import com.liceman.application.training.infrastructure.dto.TrainingDTO;
+import com.liceman.application.training.infrastructure.dto.TrainingEventDTO;
 import com.liceman.application.user.domain.User;
 import com.liceman.application.user.infrastructure.dto.UserResponseDTO;
 import com.liceman.application.user.infrastructure.dto.UserResponseWithoutTrainingDTO;
@@ -76,6 +78,20 @@ public class MapperUtilsImpl implements MapperUtils {
                 .created_at(comment.getCreated_at())
                 .build();
         return commentDTO;
+    }
+
+    @Override
+    public TrainingEventDTO mapperToTrainingEventDTO(TrainingEvent trainingEvent) {
+        TrainingEventDTO trainingEventDTO = TrainingEventDTO.builder()
+                .trainingEventId(trainingEvent.getId())
+                .trainingId(trainingEvent.getTraining().getId())
+                .userId(trainingEvent.getUser().getId())
+                .userName(trainingEvent.getUser().getFirstname() + " " + trainingEvent.getUser().getLastname())
+                .currentStatus(trainingEvent.getCurrentStatus())
+                .event(trainingEvent.getEvent())
+                .timestamp(trainingEvent.getTimestamp())
+                .build();
+        return trainingEventDTO;
     }
 
 
